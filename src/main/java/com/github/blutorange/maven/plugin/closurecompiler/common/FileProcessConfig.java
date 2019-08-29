@@ -9,15 +9,17 @@ public class FileProcessConfig {
   private final int bufferSize;
   private final String lineSeparator;
   private final SkipMode skipMode;
+  private final String outputFilename;
 
   public FileProcessConfig(String lineSeparator, int bufferSize, boolean force,
-      boolean skipMerge, boolean skipMinify, SkipMode skipMode) {
+      boolean skipMerge, boolean skipMinify, SkipMode skipMode, String outputFilename) {
     this.lineSeparator = lineSeparator;
     this.bufferSize = bufferSize;
     this.force = force;
     this.skipMerge = skipMerge;
     this.skipMinify = skipMinify;
     this.skipMode = skipMode;
+    this.outputFilename = outputFilename;
   }
 
   public boolean isSkipMerge() {
@@ -42,5 +44,9 @@ public class FileProcessConfig {
 
   public String getLineSeparator() {
     return lineSeparator;
+  }
+
+  public String getOutputFilename() {
+    return outputFilename;
   }
 }

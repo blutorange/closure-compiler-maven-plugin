@@ -245,13 +245,13 @@ public abstract class ProcessFilesTask implements Callable<Object> {
     }
     // Merge-only
     else if (processConfig.isSkipMinify()) {
-      File mergedFile = outputFilenameInterpolator.interpolate(new File(targetDir, DEFAULT_MERGED_FILENAME), targetDir, targetDir);
+      File mergedFile = outputFilenameInterpolator.interpolate(new File(targetDir, processConfig.getOutputFilename()), targetDir, targetDir);
       results.add(merge(mergedFile));
       mojoMeta.getLog().info("Skipping the minify step...");
     }
     // Minify + merge
     else {
-      File minifiedFile = outputFilenameInterpolator.interpolate(new File(targetDir, DEFAULT_MERGED_FILENAME), targetDir, targetDir);
+      File minifiedFile = outputFilenameInterpolator.interpolate(new File(targetDir, processConfig.getOutputFilename()), targetDir, targetDir);
       results.add(minify(files, minifiedFile));
     }
 

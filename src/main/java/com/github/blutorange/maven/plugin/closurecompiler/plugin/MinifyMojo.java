@@ -586,7 +586,7 @@ public class MinifyMojo extends AbstractMojo {
    * resulting merged file is called {@code script.min.js}.
    * @since 2.0.0
    */
-  @Parameter(property = "outputFileName", defaultValue = "#{path}/#{basename}.min.#{extension}")
+  @Parameter(property = "outputFilename", defaultValue = "#{path}/#{basename}.min.#{extension}")
   private String outputFilename;
 
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -664,7 +664,7 @@ public class MinifyMojo extends AbstractMojo {
   private ProcessFilesTask createJSTask(ClosureConfig closureConfig,
       List<String> includes, List<String> excludes, String outputFilename)
       throws IOException {
-    FileProcessConfig processConfig = new FileProcessConfig(lineSeparator, bufferSize, force, skipMerge, skipMinify, skipMode);
+    FileProcessConfig processConfig = new FileProcessConfig(lineSeparator, bufferSize, force, skipMerge, skipMinify, skipMode, outputFilename);
     FileSpecifier fileSpecifier = new FileSpecifier(baseSourceDir, baseTargetDir, sourceDir, targetDir, includes, excludes, outputFilename);
     MojoMetadata mojoMeta = new MojoMetaImpl(project, getLog(), encoding, buildContext);
     return new ProcessJSFilesTask(mojoMeta, processConfig, fileSpecifier, closureConfig);

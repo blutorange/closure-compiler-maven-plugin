@@ -92,7 +92,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
                 closureConfig.isCreateSourceMapFile()
                         ? Arrays.asList(minifiedFile, sourceMapFile)
                         : Collections.singleton(minifiedFile))) {
-            return ProcessingResult.skipped().build();
+            return ProcessingResult.skipped(minifiedFile).build();
         }
 
         mkDir(targetDir);

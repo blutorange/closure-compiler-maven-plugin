@@ -8,14 +8,19 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 
 final class TextFileModifications {
-    public static void applyAndWrite(File file, Charset encoding, List<TextFileModification> modifications)
+    public static boolean applyAndWrite(File file, Charset encoding, List<TextFileModification> modifications)
             throws IOException {
         final var textContent = FileUtils.readFileToString(file, encoding);
         final var modifiedContent = apply(textContent, modifications);
-        FileUtils.writeStringToFile(file, modifiedContent, encoding);
+        final var hasChanges = !Objects.equals(textContent, modifications);
+        if (hasChanges) {
+            FileUtils.writeStringToFile(file, modifiedContent, encoding);
+        }
+        return hasChanges;
     }
 
     public static String apply(String textContent, List<TextFileModification> modifications) {

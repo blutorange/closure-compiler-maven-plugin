@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.blutorange</groupId>
+	<artifactId>closure-compiler-maven-plugin-test-html-update</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<parent>
+		<groupId>com.github.blutorange</groupId>
+		<artifactId>closure-compiler-maven-plugin-test</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../parent/pom.xml</relativePath>
+	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.github.blutorange</groupId>
+				<artifactId>closure-compiler-maven-plugin</artifactId>
+				<configuration>
+					<baseSourceDir>${project.basedir}</baseSourceDir>
+					<baseTargetDir>${project.build.directory}/generated-resources</baseTargetDir>
+					<targetDir>web/js</targetDir>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-minify</id>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+						<configuration>
+							<includes>
+								<include>**/hello1.js</include>
+							</includes>
+							<outputFilename>script1.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<htmlDir>web/html/page1</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -2,8 +2,8 @@ package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
 import com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.collections4.ListUtils;
 
 public class FileSet {
     @SuppressWarnings("unused")
@@ -13,11 +13,17 @@ public class FileSet {
     private List<String> excludes;
 
     public List<String> getIncludes() {
-        return ListUtils.emptyIfNull(includes);
+        if (includes == null) {
+            includes = new ArrayList<>();
+        }
+        return includes;
     }
 
     public List<String> getExcludes() {
-        return ListUtils.emptyIfNull(excludes);
+        if (excludes == null) {
+            excludes = new ArrayList<>();
+        }
+        return excludes;
     }
 
     public List<File> getFiles(File baseDir) {

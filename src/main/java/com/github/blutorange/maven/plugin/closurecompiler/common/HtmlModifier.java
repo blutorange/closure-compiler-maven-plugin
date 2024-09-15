@@ -15,6 +15,9 @@ final class HtmlModifier {
         while (attributesIterator.hasNext()) {
             final var attribute = attributesIterator.next();
             if (Objects.equals(name, attribute.getKey())) {
+                if (Objects.equals(newValue, attribute.getValue())) {
+                    return null;
+                }
                 final var sourceRange = attribute.sourceRange();
                 final var nameRange = sourceRange.valueRange();
                 final var valueRange = sourceRange.valueRange();

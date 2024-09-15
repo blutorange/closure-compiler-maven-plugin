@@ -7,11 +7,16 @@ import java.util.List;
 import org.apache.maven.plugins.annotations.Parameter;
 
 public class HtmlUpdate {
+    /** A list of attributes to set to the new script path. Defaults to <code>"src"</code> when empty. */
+    @SuppressWarnings("unused")
+    @Parameter(name = "attributes")
+    private List<String> attributes;
+
     /**
      * File set with the HTML files to update. Relative file paths are evaluated relative to the <code>htmlDir</code>.
      * Both HTML and XHTML files are supported.
      *
-     * <p>When not given, no files will be updated.
+     * <p>Defaults to <code>**&#47;*.html</code>, i.e. include all HTML files in the <code>htmlDir</code>.
      */
     @SuppressWarnings("unused")
     @Parameter(name = "htmlFiles")
@@ -131,14 +136,10 @@ public class HtmlUpdate {
     @Parameter(name = "scripts")
     private String scripts;
 
-    /** A list of attributes to set to the new script path. Defaults to <code>"src"</code> when empty. */
-    @SuppressWarnings("unused")
-    @Parameter(name = "attributes")
-    private List<String> attributes;
-
     public FileSet getHtmlFiles() {
         if (htmlFiles == null) {
             htmlFiles = new FileSet();
+            htmlFiles.getIncludes().add("**/*.html");
         }
         return htmlFiles;
     }

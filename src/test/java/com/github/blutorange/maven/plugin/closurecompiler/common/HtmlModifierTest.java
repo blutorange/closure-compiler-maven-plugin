@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -90,7 +91,7 @@ public class HtmlModifierTest {
 
         // <script src></script>
         assertSetAttribute(
-                "<html><body><script src=\"\"></script></body></html>",
+                "<html><body><script src></script></body></html>",
                 "<html><body><script src></script></body></html>",
                 "");
         assertSetAttribute(
@@ -100,7 +101,7 @@ public class HtmlModifierTest {
 
         // <script src name=x></script>
         assertSetAttribute(
-                "<html><body><script src=\"\" name=x></script></body></html>",
+                "<html><body><script src name=x></script></body></html>",
                 "<html><body><script src name=x></script></body></html>",
                 "");
         assertSetAttribute(
@@ -110,7 +111,7 @@ public class HtmlModifierTest {
 
         // <script src  ></script>
         assertSetAttribute(
-                "<html><body><script src=\"\"  ></script></body></html>",
+                "<html><body><script src  ></script></body></html>",
                 "<html><body><script src  ></script></body></html>",
                 "");
         assertSetAttribute(
@@ -119,16 +120,13 @@ public class HtmlModifierTest {
                 "qux");
 
         // <script src></script>
-        assertSetAttribute(
-                "<html><body><script src=\"\"/></body></html>", "<html><body><script src/></body></html>", "");
+        assertSetAttribute("<html><body><script src/></body></html>", "<html><body><script src/></body></html>", "");
         assertSetAttribute(
                 "<html><body><script src=\"qux\"/></body></html>", "<html><body><script src/></body></html>", "qux");
 
         // <script src name=x></script>
         assertSetAttribute(
-                "<html><body><script src=\"\" name=x/></body></html>",
-                "<html><body><script src name=x/></body></html>",
-                "");
+                "<html><body><script src name=x/></body></html>", "<html><body><script src name=x/></body></html>", "");
         assertSetAttribute(
                 "<html><body><script src=\"qux\" name=x/></body></html>",
                 "<html><body><script src name=x/></body></html>",
@@ -136,7 +134,7 @@ public class HtmlModifierTest {
 
         // <script src  />
         assertSetAttribute(
-                "<html><body><script src=\"\"  /></body></html>", "<html><body><script src  /></body></html>", "");
+                "<html><body><script src  /></body></html>", "<html><body><script src  /></body></html>", "");
         assertSetAttribute(
                 "<html><body><script src=\"qux\"  /></body></html>",
                 "<html><body><script src  /></body></html>",
@@ -144,7 +142,7 @@ public class HtmlModifierTest {
 
         // <script src=""></script>
         assertSetAttribute(
-                "<html><body><script src=\"\"></script></body></html>",
+                "<html><body><script src=''></script></body></html>",
                 "<html><body><script src=''></script></body></html>",
                 "");
         assertSetAttribute(
@@ -158,7 +156,7 @@ public class HtmlModifierTest {
 
         // <script src="" name=x></script>
         assertSetAttribute(
-                "<html><body><script src=\"\" name=x></script></body></html>",
+                "<html><body><script src='' name=x></script></body></html>",
                 "<html><body><script src='' name=x></script></body></html>",
                 "");
         assertSetAttribute(
@@ -172,7 +170,7 @@ public class HtmlModifierTest {
 
         // <script src  =  ""></script>
         assertSetAttribute(
-                "<html><body><script src=\"\"></script></body></html>",
+                "<html><body><script src  =  ''></script></body></html>",
                 "<html><body><script src  =  ''></script></body></html>",
                 "");
         assertSetAttribute(
@@ -186,7 +184,7 @@ public class HtmlModifierTest {
 
         // <script src=""/>
         assertSetAttribute(
-                "<html><body><script src=\"\"/></body></html>", "<html><body><script src=''/></body></html>", "");
+                "<html><body><script src=''/></body></html>", "<html><body><script src=''/></body></html>", "");
         assertSetAttribute(
                 "<html><body><script src=\"qux\"/></body></html>", "<html><body><script src=''/></body></html>", "qux");
         assertSetAttribute(
@@ -196,7 +194,7 @@ public class HtmlModifierTest {
 
         // <script src="" name=x/>
         assertSetAttribute(
-                "<html><body><script src=\"\" name=x/></body></html>",
+                "<html><body><script src='' name=x/></body></html>",
                 "<html><body><script src='' name=x/></body></html>",
                 "");
         assertSetAttribute(
@@ -210,7 +208,9 @@ public class HtmlModifierTest {
 
         // <script src  =  ""  />
         assertSetAttribute(
-                "<html><body><script src=\"\"/></body></html>", "<html><body><script src  =  ''  /></body></html>", "");
+                "<html><body><script src  =  ''  /></body></html>",
+                "<html><body><script src  =  ''  /></body></html>",
+                "");
         assertSetAttribute(
                 "<html><body><script src=\"qux\"/></body></html>",
                 "<html><body><script src  =  ''  /></body></html>",
@@ -260,6 +260,7 @@ public class HtmlModifierTest {
         var doc = Jsoup.parse(inputHtml, "utf-8", parser);
         var modifications = doc.select("script").stream()
                 .map(element -> createModification.apply(element, html))
+                .filter(Objects::nonNull)
                 .collect(toList());
         Collections.reverse(modifications);
         var actual = TextFileModifications.apply(inputHtml, modifications);

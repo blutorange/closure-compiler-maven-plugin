@@ -54,6 +54,9 @@ public final class HtmlUpdater {
         final var relativeHtmlPath = relativizeHtmlFile(htmlUpdate, htmlFile);
         final var modifications = new ArrayList<TextFileModification>();
         for (final var processingResult : processingResults) {
+            if (processingResult.getOutput() == null) {
+                continue;
+            }
             modifications.addAll(processProcessingResult(processingResult, htmlUpdate, htmlDocument, relativeHtmlPath));
         }
         applyModifications(htmlFile, encoding, modifications);
@@ -64,9 +67,9 @@ public final class HtmlUpdater {
         if (modifications.isEmpty()) {
             log.info("HTML file <" + htmlFile + "> is already up-to-date");
         } else {
-            log.info("Updating HTML file <" + htmlFile + ">");
             try {
-                TextFileModifications.applyAndWrite(htmlFile, encoding, modifications);
+                final var hasChanges = TextFileModifications.applyAndWrite(htmlFile, encoding, modifications);
+                log.info("Updated HTML file <" + htmlFile + ">");
             } catch (final Exception e) {
                 throw new MojoExecutionException("Failed to apply modifications to <" + htmlFile + ">", e);
             }
@@ -124,7 +127,9 @@ public final class HtmlUpdater {
             for (final var attributeName : htmlUpdate.getAttributes()) {
                 final var isHtml = isHtml(document.location());
                 final var modification = HtmlModifier.setAttribute(script, attributeName, sourcePath, isHtml);
-                modifications.add(modification);
+                if (modification != null) {
+                    modifications.add(modification);
+                }
             }
         }
         return modifications;
@@ -181,7 +186,7 @@ public final class HtmlUpdater {
         parser.setTrackErrors(100);
         parser.setTrackPosition(true);
         try {
-            final var document = Jsoup.parse(file, encoding.name(), "", parser);
+            final var document = Jsoup.parse(file, encoding.name(), file.toURI().toASCIIString(), parser);
             for (final var error : parser.getErrors()) {
                 log.error("Encountered error while parsing <" + file + "> at position <" + error.getCursorPos() + "> : "
                         + error.getErrorMessage());
@@ -206,7 +211,8 @@ public final class HtmlUpdater {
         final var base = FileHelper.getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getHtmlDir());
         final var htmlFiles = htmlUpdate.getHtmlFiles().getFiles(base);
         if (htmlFiles.isEmpty()) {
-            log.warn("Did not find any HTML files to update in directory <" + base + "> " + htmlUpdate.getHtmlFiles());
+            log.warn("Did not find any HTML files to update in directory <" + base + "> with "
+                    + htmlUpdate.getHtmlFiles());
         }
         return htmlFiles;
     }

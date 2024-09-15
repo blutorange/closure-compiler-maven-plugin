@@ -310,7 +310,7 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
      */
     protected final ProcessingResult copy(File sourceFile, File targetFile) throws IOException {
         if (!haveFilesChanged(Collections.singleton(sourceFile), Collections.singleton(targetFile))) {
-            return ProcessingResult.skipped().build();
+            return ProcessingResult.skipped(targetFile).build();
         }
 
         mkDir(targetDir);
@@ -363,7 +363,7 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
      */
     protected final ProcessingResult merge(File mergedFile) throws IOException {
         if (!haveFilesChanged(files, Collections.singleton(mergedFile))) {
-            return ProcessingResult.skipped().build();
+            return ProcessingResult.skipped(mergedFile).build();
         }
 
         mkDir(targetDir);

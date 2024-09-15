@@ -830,7 +830,7 @@ public class MinifyMojo extends AbstractMojo {
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
      */
     @SuppressWarnings("unused")
-    @Parameter(name = "baseHtmlScriptRoot", defaultValue = "${project.build.directory}/target/generated-resources")
+    @Parameter(name = "baseHtmlScriptRoot", defaultValue = "${project.build.directory}/generated-resources")
     private String baseHtmlScriptRoot;
 
     /**

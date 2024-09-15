@@ -1,6 +1,5 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
-import com.google.common.base.Preconditions;
 import java.io.File;
 
 public class ProcessingResult {
@@ -12,14 +11,14 @@ public class ProcessingResult {
         this.output = builder.output;
     }
 
-    public static Builder skipped() {
+    public static Builder skipped(File file) {
         final var builder = new ProcessingResult.Builder();
         builder.wasSkipped = true;
+        builder.output = file;
         return builder;
     }
 
     public static Builder success(File file) {
-        Preconditions.checkNotNull(file, "Output file must not be null");
         final var builder = new ProcessingResult.Builder();
         builder.output = file;
         return builder;

@@ -1,0 +1,12 @@
+<html>
+    <head>
+        <title>Hello, page xml file</title>
+    </head>
+    <body>
+        <main>
+            <p>Hello!</p>
+        </main>
+        <script defer="true" async="true" src="old.js"></script>
+        <script defer="true" async="true" src="other.js"></script>
+    </body>
+</html>

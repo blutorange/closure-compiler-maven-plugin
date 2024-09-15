@@ -57,7 +57,47 @@
 							<outputFilename>page-basic.min.js</outputFilename>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlDir>template_builder/web/html/pageBasic</htmlDir>
+									<dir>template_builder/web/html/pageBasic</dir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can also update an XML file  -->
+					<execution>
+						<id>xml-file</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageXmlFile</sourceDir>
+							<targetDir>pageXmlFile</targetDir>
+							<outputFilename>page-xml-file.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<files>
+										<includes>
+											<include>**/*.xml</include>
+										</includes>
+									</files>
+									<dir>template_builder/web/html/pageXmlFile</dir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can also update an XHTML file  -->
+					<execution>
+						<id>xhtml-file</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageXhtmlFile</sourceDir>
+							<targetDir>pageXhtmlFile</targetDir>
+							<outputFilename>page-xhtml-file.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<files>
+										<includes>
+											<include>**/*.xhtml</include>
+										</includes>
+									</files>
+									<dir>template_builder/web/html/pageXhtmlFile</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -73,7 +113,7 @@
 							<htmlUpdates>
 								<htmlUpdate>
 									<scripts>id:target2</scripts>
-									<htmlDir>template_builder/web/html/pageScriptSelector/id</htmlDir>
+									<dir>template_builder/web/html/pageScriptSelector/id</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -89,7 +129,7 @@
 							<htmlUpdates>
 								<htmlUpdate>
 									<scripts>css:.target2[type=module]</scripts>
-									<htmlDir>template_builder/web/html/pageScriptSelector/css</htmlDir>
+									<dir>template_builder/web/html/pageScriptSelector/css</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -105,7 +145,7 @@
 							<htmlUpdates>
 								<htmlUpdate>
 									<scripts>xpath://script[contains(text(), "target2")]</scripts>
-									<htmlDir>template_builder/web/html/pageScriptSelector/xpath</htmlDir>
+									<dir>template_builder/web/html/pageScriptSelector/xpath</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -124,24 +164,39 @@
 										<attribute>src</attribute>
 										<attribute>data-src</attribute>
 									</attributes>
-									<htmlDir>template_builder/web/html/pageAttributes</htmlDir>
+									<dir>template_builder/web/html/pageAttributes</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
 					</execution>
 					<!-- Tests that we can use the physical path of the HTML and script file to derive the relative path -->
 					<execution>
-						<id>physical-path</id>
+						<id>use-physical-root</id>
 						<goals><goal>minify</goal></goals>
 						<configuration>
-							<sourceDir>pagePhysicalPath</sourceDir>
-							<targetDir>pagePhysicalPath</targetDir>
-							<outputFilename>page-physical-path.min.js</outputFilename>
+							<sourceDir>pageUsePhysicalRoot</sourceDir>
+							<targetDir>pageUsePhysicalRoot</targetDir>
+							<outputFilename>page-use-physical-root.min.js</outputFilename>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlRoot>/</htmlRoot>
-									<htmlScriptRoot>/</htmlScriptRoot>
-									<htmlDir>template_builder/web/html/pagePhysicalPath</htmlDir>
+									<usePhysicalRoot>true</usePhysicalRoot>
+									<dir>template_builder/web/html/pageUsePhysicalRoot</dir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can specify usePhysicalRoot globally -->
+					<execution>
+						<id>use-physical-root-global</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageUsePhysicalRootGlobal</sourceDir>
+							<targetDir>pageUsePhysicalRootGlobal</targetDir>
+							<outputFilename>page-use-physical-root-global.min.js</outputFilename>
+							<htmlUsePhysicalRoot>true</htmlUsePhysicalRoot>
+							<htmlUpdates>
+								<htmlUpdate>
+									<dir>template_builder/web/html/pageUsePhysicalRootGlobal</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -157,7 +212,23 @@
 							<htmlUpdates>
 								<htmlUpdate>
 									<sourcePath>~/some/thing/#{filename}/#{basename}/#{extension}?path=#{path}</sourcePath>
-									<htmlDir>template_builder/web/html/pageSourcePath</htmlDir>
+									<dir>template_builder/web/html/pageSourcePath</dir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can specify the source path globally -->
+					<execution>
+						<id>source-path-global</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageSourcePathGlobal</sourceDir>
+							<targetDir>pageSourcePathGlobal</targetDir>
+							<outputFilename>page-source-path-global.min.js</outputFilename>
+							<htmlSourcePath>~/some/thing/#{filename}/#{basename}/#{extension}?path=#{path}</htmlSourcePath>
+							<htmlUpdates>
+								<htmlUpdate>
+									<dir>template_builder/web/html/pageSourcePathGlobal</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -172,8 +243,8 @@
 							<outputFilename>page-html-文字符号化方式.min.js</outputFilename>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlEncoding>UTF-16BE</htmlEncoding>
-									<htmlDir>template_builder/web/html/pageHtmlEncoding</htmlDir>
+									<encoding>UTF-16BE</encoding>
+									<dir>template_builder/web/html/pageHtmlEncoding</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -188,15 +259,15 @@
 							<outputFilename>page-html-files.min.js</outputFilename>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlFiles>
+									<files>
 										<includes>
 											<include>**/index-*.html</include>
 										</includes>
 										<excludes>
 											<exclude>**/*-exclude.html</exclude>
 										</excludes>
-									</htmlFiles>
-									<htmlDir>template_builder/web/html/pageHtmlFiles</htmlDir>
+									</files>
+									<dir>template_builder/web/html/pageHtmlFiles</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -215,9 +286,9 @@
 							<htmlScriptRoot>test/node_js</htmlScriptRoot>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlRoot>web/html/pageRoot</htmlRoot>
-									<htmlScriptRoot>web/js/pageRoot</htmlScriptRoot>
-									<htmlDir>template_builder/web/html/pageRoot</htmlDir>
+									<root>web/html/pageRoot</root>
+									<scriptRoot>web/js/pageRoot</scriptRoot>
+									<dir>template_builder/web/html/pageRoot</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>
@@ -234,7 +305,7 @@
 							<htmlDir>test/template_builder</htmlDir>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlDir>web/html/pageHtmlDir</htmlDir>
+									<dir>web/html/pageHtmlDir</dir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>

@@ -8,7 +8,7 @@
                 <p>It uses the Java API of closure compiler, but I try to stay as close to the options from the <a href="https://github.com/google/closure-compiler/wiki/Flags-and-Options">Closure Compiler CLI application</a>.</p>
             </answer>
         </faq>
-        <faq id="m2e-integration">
+        <faq id="m2e-new-option">
             <question>Can you add a new option from Closure Compiler?</question>
             <answer>
                 <p>Sure, no problem. <a href="./issue-management.html">Open a new issue</a></p>.
@@ -37,7 +37,7 @@
         <faq id="m2e-integration">
             <question>Does Closure Compiler Maven Plugin integrate with Eclipse m2e?</question>
             <answer>
-                <p><a href="./examples/m2e.html">Yes</a></p>.
+                <p><a href="./examples/m2e.html">Yes</a></p>
             </answer>
         </faq>
         <faq id="alternative-compilers">

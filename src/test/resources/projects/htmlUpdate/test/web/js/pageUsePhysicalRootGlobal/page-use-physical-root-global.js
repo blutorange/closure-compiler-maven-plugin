@@ -2,5 +2,5 @@ function main() {
 	function sayHello(name) {
 		console.log("Hello, " + name + "!");
 	}
-	sayHello("page-physical-path");
+	sayHello("page-use-physical-root-global");
 }

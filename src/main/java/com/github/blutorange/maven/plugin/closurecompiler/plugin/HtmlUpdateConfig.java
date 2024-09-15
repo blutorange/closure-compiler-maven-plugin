@@ -4,6 +4,10 @@ import java.io.File;
 import java.util.List;
 
 public interface HtmlUpdateConfig {
+    Boolean isHtmlUsePhysicalRoot();
+
+    String getHtmlSourcePath();
+
     List<HtmlUpdate> getHtmlUpdates();
 
     File getHtmlDir();

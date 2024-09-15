@@ -148,6 +148,8 @@ The source map `bundle.min.map.js` now references the source files as `../../src
 
 For the example above, this means that the source file name would be `js/index.js`. We could now set this option to replace `js/` with `https://example.com/sources/`. Now the source map contains a reference to the source file as `https://example.com/sources/index.js`.
 
+
+
 # Build site
 
 * Edit files in `/src/site`

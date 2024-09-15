@@ -769,7 +769,7 @@ public class MinifyMojo extends AbstractMojo {
      *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
      *   <li>Script file - <code>
      *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
-     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code>
      *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
      * </ul>
      *
@@ -796,7 +796,7 @@ public class MinifyMojo extends AbstractMojo {
      *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
      *   <li>Script file - <code>
      *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
-     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code>
      *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
      * </ul>
      *
@@ -822,7 +822,7 @@ public class MinifyMojo extends AbstractMojo {
      *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
      *   <li>Script file - <code>
      *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
-     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code>
      *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
      * </ul>
      *
@@ -849,7 +849,7 @@ public class MinifyMojo extends AbstractMojo {
      *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
      *   <li>Script file - <code>
      *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
-     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code>
      *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
      * </ul>
      *
@@ -862,6 +862,24 @@ public class MinifyMojo extends AbstractMojo {
     @SuppressWarnings("unused")
     @Parameter(name = "htmlScriptRoot")
     private String htmlScriptRoot;
+
+    /**
+     * Allows you to set the <code>sourcePath</code> option globally for each <code>htmlUpdate</code>, see the <code>
+     * htmlUpdates</code> option for more details. You can still override this option for each <code>htmlUpdate</code>,
+     * if you wish.
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "htmlSourcePath")
+    private String htmlSourcePath;
+
+    /**
+     * Allows you to set the <code>usePhysicalLocation</code> option globally for each <code>htmlUpdate</code>, see the
+     * <code>htmlUpdates</code> option for more details. You can still override this option for each <code>htmlUpdate
+     * </code>, if you wish.
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "htmlUsePhysicalRoot")
+    private Boolean htmlUsePhysicalRoot;
 
     /**
      * The line separator to be used when merging files etc. Defaults to the default system line separator. Special
@@ -1083,8 +1101,13 @@ public class MinifyMojo extends AbstractMojo {
                 absoluteFileToCanonicalFile(getAbsoluteFile(projectBasedir, baseHtmlRoot, htmlRoot));
         final var resolvedHtmlScriptRoot =
                 absoluteFileToCanonicalFile(getAbsoluteFile(projectBasedir, baseHtmlScriptRoot, htmlScriptRoot));
-        final var updateConfig =
-                new HtmlUpdateConfigImpl(htmlUpdates, resolvedHtmlDir, resolvedHtmlRoot, resolvedHtmlScriptRoot);
+        final var updateConfig = new HtmlUpdateConfigImpl(
+                htmlUpdates,
+                resolvedHtmlDir,
+                resolvedHtmlRoot,
+                resolvedHtmlScriptRoot,
+                htmlSourcePath,
+                htmlUsePhysicalRoot);
         return new HtmlUpdater(mojoMeta, updateConfig);
     }
 

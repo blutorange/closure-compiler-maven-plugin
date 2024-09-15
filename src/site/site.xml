@@ -1,9 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<site xmlns="http://maven.apache.org/SITE/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
+      name="Closure Compiler Maven Plugin">
+
     <publishDate position="right" format="yyyy-MM-dd"/>
     <version position="right"/>
 
     <body>
+        <links>
+            <item name="Apache" href="http://www.apache.org"/>
+            <item name="Maven" href="https://maven.apache.org"/>
+        </links>
+
         <breadcrumbs>
             <item name="Minify Maven Plugin" href="https://github.com/blutorange/closure-compiler-maven-plugin" />
         </breadcrumbs>
@@ -22,6 +30,7 @@
             <item name="Exclude source files from WAR package" href="examples/exclude.html" />
             <item name="Eclipse m2e maven integration" href="examples/m2e.html" />
             <item name="Watching for file changes" href="examples/watch.html" />
+            <item name="Updating HTML files" href="examples/htmlUpdate.html" />
         </menu>
         <menu ref="reports" />
     </body>
@@ -29,13 +38,13 @@
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
-        <version>1.7</version>
+        <version>2.0.0-M10</version>
     </skin>
 
     <custom>
         <fluidoSkin>
             <leftColumnClass>span3</leftColumnClass>
-            <bodyColumnClass>span9</bodyColumnClass>            
+            <bodyColumnClass>span9</bodyColumnClass>
             <gitHub>
                 <projectId>blutorange/closure-compiler-maven-plugin</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
@@ -43,4 +52,4 @@
             </gitHub>
         </fluidoSkin>
     </custom>
-</project>
+</site>

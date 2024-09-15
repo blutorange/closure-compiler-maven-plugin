@@ -41,4 +41,5 @@ Closure Compiler Maven Plugin
   * {{{./examples/m2e.html}Eclipse m2e maven integration}}
   
   * {{{./examples/watch.html}Watching for file changes}}
-  
+
+  * {{{./examples/htmlUpdate.html}Updating HTML files}}

@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.jsoup.Jsoup;
@@ -77,7 +79,7 @@ public final class HtmlUpdater {
     private void processHtmlFile(List<ProcessingResult> processingResults, HtmlUpdate htmlUpdate, File htmlFile)
             throws MojoExecutionException {
         log.debug("Processing HTML file <" + htmlFile + ">");
-        final var encoding = Charset.forName(htmlUpdate.getHtmlEncoding());
+        final var encoding = Charset.forName(htmlUpdate.getEncoding());
         final var htmlDocument = parseHtmlFile(htmlFile, encoding);
         if (htmlDocument == null) {
             return;
@@ -133,34 +135,44 @@ public final class HtmlUpdater {
 
     private String resolveSourcePath(
             HtmlUpdate htmlUpdate, String relativeHtmlPath, String relativeScriptPath, File scriptFile) {
-        if (htmlUpdate.getSourcePath().isEmpty()) {
+        final var sourcePath = StringUtils.defaultIfBlank(updateConfig.getHtmlSourcePath(), htmlUpdate.getSourcePath());
+        if (sourcePath.isBlank()) {
             final var relativeHtmlDirPath = new File(relativeHtmlPath).getParentFile();
             final var relativePath = relativizeRelativePath(relativeHtmlDirPath, new File(relativeScriptPath));
             return toWebPath(relativePath);
         } else {
-            final var interpolator = new FilenameInterpolator(htmlUpdate.getSourcePath());
-            final var scriptBaseDir = "/".equals(htmlUpdate.getHtmlScriptRoot())
+            final var interpolator = new FilenameInterpolator(sourcePath);
+            final var usePhysicalRoot = resolveUsePhysicalRoot(htmlUpdate);
+            final var scriptBaseDir = usePhysicalRoot
                     ? scriptFile
-                    : getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getHtmlScriptRoot());
+                    : getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getScriptRoot());
             final var path = interpolator.interpolateRelative(scriptFile, scriptBaseDir);
             return separatorsToUnix(path);
         }
     }
 
     private String relativizeHtmlFile(HtmlUpdate htmlUpdate, File htmlFile) throws MojoExecutionException {
-        if ("/".equals(htmlUpdate.getHtmlRoot())) {
+        final var usePhysicalRoot = resolveUsePhysicalRoot(htmlUpdate);
+        if (usePhysicalRoot) {
             return htmlFile.getPath();
         }
-        final var htmlRoot = getAbsoluteFile(updateConfig.getHtmlRoot(), htmlUpdate.getHtmlRoot());
+        final var htmlRoot = getAbsoluteFile(updateConfig.getHtmlRoot(), htmlUpdate.getRoot());
         return relativizePath(htmlRoot, htmlFile);
     }
 
     private String relativizeScriptFile(HtmlUpdate htmlUpdate, File scriptFile) throws MojoExecutionException {
-        if ("/".equals(htmlUpdate.getHtmlScriptRoot())) {
+        final var usePhysicalRoot = resolveUsePhysicalRoot(htmlUpdate);
+        if (usePhysicalRoot) {
             return scriptFile.getPath();
         }
-        final var htmlScriptRoot = getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getHtmlScriptRoot());
+        final var htmlScriptRoot = getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getScriptRoot());
         return relativizePath(htmlScriptRoot, scriptFile);
+    }
+
+    private boolean resolveUsePhysicalRoot(HtmlUpdate htmlUpdate) {
+        final var resolved =
+                ObjectUtils.defaultIfNull(htmlUpdate.isUsePhysicalRoot(), updateConfig.isHtmlUsePhysicalRoot());
+        return Boolean.TRUE.equals(resolved);
     }
 
     private List<TextFileModification> updateHtmlFile(HtmlUpdate htmlUpdate, Document document, String sourcePath) {
@@ -256,11 +268,10 @@ public final class HtmlUpdater {
     }
 
     private List<File> resolveHtmlFiles(HtmlUpdate htmlUpdate) {
-        final var base = getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getHtmlDir());
-        final var htmlFiles = htmlUpdate.getHtmlFiles().getFiles(base);
+        final var base = getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getDir());
+        final var htmlFiles = htmlUpdate.getFiles().getFiles(base);
         if (htmlFiles.isEmpty()) {
-            log.warn("Did not find any HTML files to update in directory <" + base + "> with "
-                    + htmlUpdate.getHtmlFiles());
+            log.warn("Did not find any HTML files to update in directory <" + base + "> with " + htmlUpdate.getFiles());
         }
         return htmlFiles;
     }

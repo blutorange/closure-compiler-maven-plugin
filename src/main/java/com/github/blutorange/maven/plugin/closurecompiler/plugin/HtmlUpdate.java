@@ -19,8 +19,8 @@ public class HtmlUpdate {
      * <p>Defaults to <code>**&#47;*.html</code>, i.e. include all HTML files in the <code>htmlDir</code>.
      */
     @SuppressWarnings("unused")
-    @Parameter(name = "htmlFiles")
-    private FileSet htmlFiles;
+    @Parameter(name = "files")
+    private FileSet files;
 
     /**
      * Base directory relative to which the <code>htmlFiles</code> to process are evaluated. Relative paths are
@@ -29,11 +29,12 @@ public class HtmlUpdate {
      * <p>When not given, defaults to the <code>htmlDir</code> option of the plugin configuration.
      */
     @SuppressWarnings("unused")
-    @Parameter(name = "htmlDir")
-    private String htmlDir;
+    @Parameter(name = "dir")
+    private String dir;
 
     /**
-     * When given, the <code>htmlRoot</code> and <code>htmlScriptRoot</code> options are ignored.
+     * When given, the <code>usePhysicalRoot</code>, <code>htmlRoot</code>, <code>htmlScriptRoot</code> options are
+     * ignored.
      *
      * <p>The path to use as the <code>src</code> attribute for the script file.
      *
@@ -47,13 +48,16 @@ public class HtmlUpdate {
      *   <li>The variable {@code path} is replaced with the path of the script file, relative to the <code>
      *       htmlScriptRoot</code>
      * </ul>
+     *
+     * <p>Precedence: <code>sourcePath</code> has the highest priority. <code>usePhysicalRoot</code> comes next, <code>
+     * root</code> and <code>scriptRoot</code> have the lowest priority.
      */
     @SuppressWarnings("unused")
     @Parameter(name = "sourcePath")
     private String sourcePath;
 
     /**
-     * This option is ignored when <code>scriptPath</code> is given.
+     * This option is ignored when <code>sourcePath</code> or <code>usePhysicalRoot</code> is set.
      *
      * <p>The root directory of the HTML files. Used to construct a relative path from the HTML file the script file.
      *
@@ -69,7 +73,7 @@ public class HtmlUpdate {
      *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
      *   <li>Script file - <code>
      *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
-     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code>
      *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
      * </ul>
      *
@@ -78,17 +82,20 @@ public class HtmlUpdate {
      *
      * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     *
+     * <p>Precedence: <code>sourcePath</code> has the highest priority. <code>usePhysicalRoot</code> comes next, <code>
+     * root</code> and <code>scriptRoot</code> have the lowest priority.
      */
     @SuppressWarnings("unused")
-    @Parameter(name = "htmlRoot")
-    private String htmlRoot;
+    @Parameter(name = "root")
+    private String root;
 
     /** The encoding (charset) of the HTML files. Defaults to <code>UTF-8</code>. */
-    @Parameter(name = "htmlEncoding")
-    private String htmlEncoding;
+    @Parameter(name = "encoding")
+    private String encoding;
 
     /**
-     * This option is ignored when <code>scriptPath</code> is given.
+     * This option is ignored when <code>sourcePath</code> or <code>usePhysicalRoot</code> is set.
      *
      * <p>The root directory of the script files. Used to construct a relative path from the HTML file the script file.
      *
@@ -104,7 +111,7 @@ public class HtmlUpdate {
      *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
      *   <li>Script file - <code>
      *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
-     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code>
      *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
      * </ul>
      *
@@ -113,10 +120,27 @@ public class HtmlUpdate {
      *
      * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     *
+     * <p>Precedence: <code>sourcePath</code> has the highest priority. <code>usePhysicalRoot</code> comes next, <code>
+     * root</code> and <code>scriptRoot</code> have the lowest priority.
      */
     @SuppressWarnings("unused")
-    @Parameter(name = "htmlScriptRoot")
-    private String htmlScriptRoot;
+    @Parameter(name = "scriptRoot")
+    private String scriptRoot;
+
+    /**
+     * This option is ignored when <code>sourcePath</code> is set.
+     *
+     * <p>When set to <code>true</code>, the <code>root</code> and <code>scriptRoot</code> options are ignored; and the
+     * physical location of the HTML and script files on the file system is used to construct the relative path of the
+     * script file against the HTML file.
+     *
+     * <p>Precedence: <code>sourcePath</code> has the highest priority. <code>usePhysicalRoot</code> comes next, <code>
+     * root</code> and <code>scriptRoot</code> have the lowest priority.
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "usePhysicalRoot")
+    private Boolean usePhysicalRoot;
 
     /**
      * Specifier for the scripts to update. May be one of the following:
@@ -136,16 +160,16 @@ public class HtmlUpdate {
     @Parameter(name = "scripts")
     private String scripts;
 
-    public FileSet getHtmlFiles() {
-        if (htmlFiles == null) {
-            htmlFiles = new FileSet();
-            htmlFiles.getIncludes().add("**/*.html");
+    public FileSet getFiles() {
+        if (files == null) {
+            files = new FileSet();
+            files.getIncludes().add("**/*.html");
         }
-        return htmlFiles;
+        return files;
     }
 
-    public String getHtmlDir() {
-        return htmlDir;
+    public String getDir() {
+        return dir;
     }
 
     public String getSourcePath() {
@@ -155,12 +179,12 @@ public class HtmlUpdate {
         return sourcePath;
     }
 
-    public String getHtmlRoot() {
-        return htmlRoot;
+    public String getRoot() {
+        return root;
     }
 
-    public String getHtmlScriptRoot() {
-        return htmlScriptRoot;
+    public String getScriptRoot() {
+        return scriptRoot;
     }
 
     public String getScripts() {
@@ -177,10 +201,14 @@ public class HtmlUpdate {
         return attributes.isEmpty() ? List.of("src") : attributes;
     }
 
-    public String getHtmlEncoding() {
-        if (htmlEncoding == null) {
-            htmlEncoding = "";
+    public String getEncoding() {
+        if (encoding == null) {
+            encoding = "";
         }
-        return htmlEncoding.isEmpty() ? UTF_8.name() : htmlEncoding;
+        return encoding.isEmpty() ? UTF_8.name() : encoding;
+    }
+
+    public Boolean isUsePhysicalRoot() {
+        return usePhysicalRoot;
     }
 }

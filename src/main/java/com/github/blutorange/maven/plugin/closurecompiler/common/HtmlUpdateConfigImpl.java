@@ -10,12 +10,32 @@ public final class HtmlUpdateConfigImpl implements HtmlUpdateConfig {
     private final File htmlDir;
     private final File htmlRoot;
     private final File htmlScriptRoot;
+    private final String htmlSourcePath;
+    private final Boolean htmlUsePhysicalRoot;
 
-    public HtmlUpdateConfigImpl(List<HtmlUpdate> htmlUpdates, File htmlDir, File htmlRoot, File htmlScriptRoot) {
+    public HtmlUpdateConfigImpl(
+            List<HtmlUpdate> htmlUpdates,
+            File htmlDir,
+            File htmlRoot,
+            File htmlScriptRoot,
+            String htmlSourcePath,
+            Boolean htmlUsePhysicalRoot) {
         this.htmlUpdates = htmlUpdates != null ? htmlUpdates : List.of();
         this.htmlDir = htmlDir;
         this.htmlRoot = htmlRoot;
         this.htmlScriptRoot = htmlScriptRoot;
+        this.htmlSourcePath = htmlSourcePath;
+        this.htmlUsePhysicalRoot = htmlUsePhysicalRoot;
+    }
+
+    @Override
+    public Boolean isHtmlUsePhysicalRoot() {
+        return htmlUsePhysicalRoot;
+    }
+
+    @Override
+    public String getHtmlSourcePath() {
+        return htmlSourcePath;
     }
 
     @Override

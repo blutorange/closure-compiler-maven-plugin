@@ -2,7 +2,6 @@ package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import com.google.javascript.jscomp.SourceMap.LocationMapping;
 import java.io.File;
-import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
@@ -22,24 +21,19 @@ public class FileSystemLocationMapping implements LocationMapping {
 
     @Override
     public String map(String location) {
-        try {
-            final String mapped;
-            if (transpilationDone) {
-                // This is the source file relative to the source map
-                mapped = location;
-            } else if (StringUtils.startsWith(StringUtils.trim(location), "[")) {
-                // Internal files from closure compiler, such as "[synthetic:base]"
-                mapped = location;
-            } else {
-                final File file = new File(baseDirForSourceFiles, location);
-                mapped = FilenameUtils.separatorsToUnix(FileHelper.relativizePath(sourceMapDir, file));
-            }
-            log.debug("Source map: mapping location [" + location + "] to [" + mapped + "]");
-            return mapped;
-        } catch (IOException e) {
-            log.error("Could not map source location for: '" + location + "'", e);
-            return null;
+        final String mapped;
+        if (transpilationDone) {
+            // This is the source file relative to the source map
+            mapped = location;
+        } else if (StringUtils.startsWith(StringUtils.trim(location), "[")) {
+            // Internal files from closure compiler, such as "[synthetic:base]"
+            mapped = location;
+        } else {
+            final File file = new File(baseDirForSourceFiles, location);
+            mapped = FilenameUtils.separatorsToUnix(FileHelper.relativizePath(sourceMapDir, file));
         }
+        log.debug("Source map: mapping location [" + location + "] to [" + mapped + "]");
+        return mapped;
     }
 
     public void setTranspilationDone(boolean transpilationDone) {

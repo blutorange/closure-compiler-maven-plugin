@@ -92,7 +92,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
                 closureConfig.isCreateSourceMapFile()
                         ? Arrays.asList(minifiedFile, sourceMapFile)
                         : Collections.singleton(minifiedFile))) {
-            return new ProcessingResult().setWasSkipped(true);
+            return ProcessingResult.skipped().build();
         }
 
         mkDir(targetDir);
@@ -193,7 +193,7 @@ public class ProcessJSFilesTask extends ProcessFilesTask {
 
         logCompressionGains(srcFiles, compiled);
 
-        return new ProcessingResult().setWasSkipped(false);
+        return ProcessingResult.success(minifiedFile).build();
     }
 
     private File getBaseDirForSourceFiles(File minifiedFile, File sourceMapFile) {

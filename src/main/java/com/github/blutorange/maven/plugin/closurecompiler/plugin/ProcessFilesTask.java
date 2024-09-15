@@ -50,7 +50,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 /** Abstract class for merging and compressing a files list. */
-public abstract class ProcessFilesTask implements Callable<Object> {
+public abstract class ProcessFilesTask implements Callable<List<ProcessingResult>> {
     private static final String DEFAULT_MERGED_FILENAME = "script.js";
 
     /**
@@ -150,28 +150,28 @@ public abstract class ProcessFilesTask implements Callable<Object> {
      * @throws MojoFailureException When the merge or minify steps fail
      */
     @Override
-    public Object call() throws IOException, MojoFailureException {
+    public List<ProcessingResult> call() throws IOException, MojoFailureException {
         synchronized (mojoMeta.getLog()) {
             mojoMeta.getLog().info("Starting JavaScript task:");
             if (!files.isEmpty()) {
                 try {
-                    processFiles();
+                    return processFiles();
                 } catch (FileException e) {
                     logFailure(e);
                     throw new MojoFailureException("Closure compilation failure", e);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     logFailure(e);
                     files.forEach(file -> mojoMeta.getBuildContext()
                             .addMessage(file, 1, 1, e.getMessage(), BuildContext.SEVERITY_ERROR, e));
                     throw e;
                 }
-            } else if (!includesEmpty) {
+            }
+            if (!includesEmpty) {
                 // 'files' list will be empty if source file paths or names added to the project's POM are invalid.
                 mojoMeta.getLog().warn("No valid JavaScript source files found to process.");
             }
+            return List.of();
         }
-
-        return null;
     }
 
     private void logFailure(Exception e) {
@@ -190,11 +190,12 @@ public abstract class ProcessFilesTask implements Callable<Object> {
     /**
      * Copy, merge and / or minify the input files.
      *
+     * @return A list with all processed files.
      * @throws IOException When an input file could not be read or an output file could not be written.
      * @throws MojoFailureException When the file could not be processed, such as when the output file is the same as
      *     the input file.
      */
-    private void processFiles() throws IOException, MojoFailureException {
+    private List<ProcessingResult> processFiles() throws IOException, MojoFailureException {
         // No merge
         final var results = new ArrayList<ProcessingResult>();
         if (processConfig.isSkipMerge()) {
@@ -228,6 +229,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
         }
 
         logResults(results);
+        return List.copyOf(results);
     }
 
     protected final void removeMessages(Collection<File> files) {
@@ -308,7 +310,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
      */
     protected final ProcessingResult copy(File sourceFile, File targetFile) throws IOException {
         if (!haveFilesChanged(Collections.singleton(sourceFile), Collections.singleton(targetFile))) {
-            return new ProcessingResult().setWasSkipped(true);
+            return ProcessingResult.skipped().build();
         }
 
         mkDir(targetDir);
@@ -350,7 +352,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
         mojoMeta.getLog().info("Creating the copied file [" + targetFile.getName() + "].");
         mojoMeta.getLog().debug("Full path is [" + targetFile.getPath() + "].");
 
-        return new ProcessingResult().setWasSkipped(false);
+        return ProcessingResult.success(targetFile).build();
     }
 
     /**
@@ -361,7 +363,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
      */
     protected final ProcessingResult merge(File mergedFile) throws IOException {
         if (!haveFilesChanged(files, Collections.singleton(mergedFile))) {
-            return new ProcessingResult().setWasSkipped(true);
+            return ProcessingResult.skipped().build();
         }
 
         mkDir(targetDir);
@@ -410,7 +412,7 @@ public abstract class ProcessFilesTask implements Callable<Object> {
             }
         }
 
-        return new ProcessingResult().setWasSkipped(false);
+        return ProcessingResult.success(mergedFile).build();
     }
 
     /**

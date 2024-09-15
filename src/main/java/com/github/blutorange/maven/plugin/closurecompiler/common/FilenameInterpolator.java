@@ -1,7 +1,6 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
@@ -24,12 +23,21 @@ public class FilenameInterpolator {
         this.escapeChar = escapeChar;
     }
 
-    public File interpolate(File inputFile, File inputBaseDir, File targetDirectory) throws IOException {
+    public File interpolate(File inputFile, File inputBaseDir, File targetDirectory) {
         return interpolate(inputFile, inputBaseDir, targetDirectory, null);
     }
 
-    public File interpolate(File inputFile, File inputBaseDir, File targetDirectory, Map<String, String> additionalData)
-            throws IOException {
+    public File interpolate(
+            File inputFile, File inputBaseDir, File targetDirectory, Map<String, String> additionalData) {
+        final var interpolatedFilename = interpolateRelative(inputFile, inputBaseDir, additionalData);
+        return new File(targetDirectory, interpolatedFilename);
+    }
+
+    public String interpolateRelative(File inputFile, File inputBaseDir) {
+        return interpolateRelative(inputFile, inputBaseDir, null);
+    }
+
+    public String interpolateRelative(File inputFile, File inputBaseDir, Map<String, String> additionalData) {
         final var inputFilename = inputFile.getName();
         final var data = new HashMap<String, String>();
         data.put("filename", inputFilename);
@@ -40,7 +48,6 @@ public class FilenameInterpolator {
             data.putAll(additionalData);
         }
         final var stringSubstitutor = new StringSubstitutor(data, prefix, suffix, escapeChar);
-        final var interpolatedFilename = stringSubstitutor.replace(pattern);
-        return new File(targetDirectory, interpolatedFilename);
+        return stringSubstitutor.replace(pattern);
     }
 }

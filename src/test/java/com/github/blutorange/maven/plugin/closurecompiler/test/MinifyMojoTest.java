@@ -1,6 +1,7 @@
 package com.github.blutorange.maven.plugin.closurecompiler.test;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Function.identity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -167,15 +167,7 @@ public class MinifyMojoTest {
 
     private Map<String, File> listFiles(File basedir) {
         return FileUtils.listFiles(basedir, null, true).stream()
-                .collect(Collectors.toMap(
-                        file -> {
-                            try {
-                                return FileHelper.relativizePath(basedir, file);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        Function.identity()));
+                .collect(Collectors.toMap(file -> FileHelper.relativizePath(basedir, file), identity()));
     }
 
     private MavenResult runMinify(String projectName) throws Exception {

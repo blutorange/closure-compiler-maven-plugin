@@ -12,17 +12,7 @@
  */
 package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
-import com.github.blutorange.maven.plugin.closurecompiler.common.Aggregation;
-import com.github.blutorange.maven.plugin.closurecompiler.common.AggregationConfiguration;
-import com.github.blutorange.maven.plugin.closurecompiler.common.ClosureConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.common.DependencyModeFlag;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileProcessConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileSpecifier;
-import com.github.blutorange.maven.plugin.closurecompiler.common.LogLevel;
-import com.github.blutorange.maven.plugin.closurecompiler.common.LogWrapper;
-import com.github.blutorange.maven.plugin.closurecompiler.common.MojoMetaImpl;
-import com.github.blutorange.maven.plugin.closurecompiler.common.SourceMapOutputType;
+import com.github.blutorange.maven.plugin.closurecompiler.common.*;
 import com.google.gson.Gson;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -58,6 +48,8 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 @Mojo(name = "minify", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class MinifyMojo extends AbstractMojo {
 
+    private final BuildContext buildContext;
+
     /**
      * By default, when the output file is the same as the input file, compilation is terminated with an error. This is
      * done to prevent source files from being overwritten accidentally with a bad configuration. If you are certain you
@@ -91,8 +83,6 @@ public class MinifyMojo extends AbstractMojo {
     @SuppressWarnings("unused")
     @Parameter(property = "bufferSize", defaultValue = "4096")
     private int bufferSize;
-
-    private final BuildContext buildContext;
 
     /**
      * Specify aggregations in an external JSON formatted config file. If not an absolute path, it must be relative to
@@ -738,6 +728,139 @@ public class MinifyMojo extends AbstractMojo {
     private ArrayList<String> includes;
 
     /**
+     * Optional. Allows you to update script tags in an HTML file with the path of the processed file(s).
+     *
+     * <p>Both HTML and XHTML files are supported.
+     *
+     * @since 2.32.0
+     */
+    @Parameter(property = "htmlUpdates")
+    private ArrayList<HtmlUpdate> htmlUpdates;
+
+    /**
+     * Base directory relative to which the <code>htmlFiles</code> to process are evaluated, see the option <code>
+     * htmlUpdates</code>. Relative paths are evaluated relative to the project's base directory.
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "baseHtmlDir", defaultValue = "${project.basedir}/src/main/resources")
+    private String baseHtmlDir;
+
+    /**
+     * Base directory relative to which the <code>htmlFiles</code> to process are evaluated, see the option <code>
+     * htmlUpdates</code>. Relative paths are evaluated relative to the <code>baseHtmlDir</code> option. When not given,
+     * defaults to <code>baseHtmlDir</code>.
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "htmlDir")
+    private String htmlDir;
+
+    /**
+     * The root directory of the HTML files, see the option <code>htmlUpdates</code>. Used to construct a relative path
+     * from the HTML file the script file.
+     *
+     * <p>Relative paths are resolved against the project's base directory.
+     *
+     * <p>For example, assume the following configuration:
+     *
+     * <ul>
+     *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
+     *   <li>Script file - <code>
+     *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
+     * </ul>
+     *
+     * Then, the relative path of the HTML file relative to the HTML root is <code>public/pages/profile/index.html
+     * </code> and the relative of the JavaScript file is <code>public/resources/main/script.min.js</code>.
+     *
+     * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
+     * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "baseHtmlRoot", defaultValue = "${project.basedir}/src/main/resources")
+    private String baseHtmlRoot;
+
+    /**
+     * The root directory of the HTML files, see the option <code>htmlUpdates</code>. Used to construct a relative path
+     * from the HTML file the script file.
+     *
+     * <p>Relative paths are resolved against the <code>baseHtmlRoot</code> option. Defaults to <code>baseHtmlRoot
+     * </code>.
+     *
+     * <p>For example, assume the following configuration:
+     *
+     * <ul>
+     *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
+     *   <li>Script file - <code>
+     *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
+     * </ul>
+     *
+     * Then, the relative path of the HTML file relative to the HTML root is <code>public/pages/profile/index.html
+     * </code> and the relative of the JavaScript file is <code>public/resources/main/script.min.js</code>.
+     *
+     * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
+     * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "htmlRoot")
+    private String htmlRoot;
+
+    /**
+     * The root directory of the script files, see the option <code>htmlUpdates</code>. Used to construct a relative
+     * path from the HTML file the script file.
+     *
+     * <p>Relative paths are resolved against the project's base directory.
+     *
+     * <p>For example, assume the following configuration:
+     *
+     * <ul>
+     *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
+     *   <li>Script file - <code>
+     *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
+     * </ul>
+     *
+     * Then, the relative path of the HTML file relative to the HTML root is <code>public/pages/profile/index.html
+     * </code> and the relative of the JavaScript file is <code>public/resources/main/script.min.js</code>.
+     *
+     * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
+     * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "baseHtmlScriptRoot", defaultValue = "${project.build.directory}/target/generated-resources")
+    private String baseHtmlScriptRoot;
+
+    /**
+     * The root directory of the script files, see the option <code>htmlUpdates</code>. Used to construct a relative
+     * path from the HTML file the script file.
+     *
+     * <p>Relative paths are resolved against the <code>baseHtmlScriptRoot</code>. Defaults to the <code>
+     * baseHtmlScriptRoot</code>.
+     *
+     * <p>For example, assume the following configuration:
+     *
+     * <ul>
+     *   <li>HTML file - <code>/home/user/project/src/main/resources/webapp/public/pages/profile/index.html</code>
+     *   <li>Script file - <code>
+     *       /home/user/project/target/generated-resources/frontend/js/public/resources/main/script.min.js</code>
+     *   <li>HTML root - <code>/home/user/project/src/main/resources/webapp</code> and the <code>scriptRoot</code>
+     *   <li>Script root - <code>/home/user/project/target/generated-resources/frontend/js</code>
+     * </ul>
+     *
+     * Then, the relative path of the HTML file relative to the HTML root is <code>public/pages/profile/index.html
+     * </code> and the relative of the JavaScript file is <code>public/resources/main/script.min.js</code>.
+     *
+     * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
+     * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     */
+    @SuppressWarnings("unused")
+    @Parameter(name = "htmlScriptRoot")
+    private String htmlScriptRoot;
+
+    /**
      * The line separator to be used when merging files etc. Defaults to the default system line separator. Special
      * characters are entered escaped. So for example, to use a new line feed as the separator, set this property to
      * {@code \n} (two characters, a backslash and the letter n).
@@ -877,11 +1000,11 @@ public class MinifyMojo extends AbstractMojo {
     private ProcessFilesTask createJSTask(
             ClosureConfig closureConfig, List<String> includes, List<String> excludes, String outputFilename)
             throws IOException {
-        FileProcessConfig processConfig = new FileProcessConfig(
+        final var processConfig = new FileProcessConfig(
                 lineSeparator, bufferSize, force, skipMerge, skipMinify, skipMode, allowReplacingInputFiles);
-        FileSpecifier fileSpecifier = new FileSpecifier(
+        final var fileSpecifier = new FileSpecifier(
                 baseSourceDir, baseTargetDir, sourceDir, targetDir, includes, excludes, outputFilename);
-        MojoMetadata mojoMeta = new MojoMetaImpl(project, getLog(), encoding, buildContext);
+        final var mojoMeta = new MojoMetaImpl(project, getLog(), encoding, buildContext);
         return new ProcessJSFilesTask(mojoMeta, processConfig, fileSpecifier, closureConfig);
     }
 
@@ -924,17 +1047,19 @@ public class MinifyMojo extends AbstractMojo {
 
         fillOptionalValues();
 
-        ClosureConfig closureConfig = new ClosureConfig(this);
+        final var closureConfig = new ClosureConfig(this);
+        final var htmlUpdater = createHtmlUpdater();
         Collection<ProcessFilesTask> processFilesTasks;
         try {
             processFilesTasks = createTasks(closureConfig);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MojoFailureException(e.getMessage(), e);
         }
 
         try {
-            for (ProcessFilesTask task : processFilesTasks) {
-                task.call();
+            for (final var task : processFilesTasks) {
+                final var processingResults = task.call();
+                htmlUpdater.process(processingResults);
             }
         } catch (Exception e) {
             if (e.getCause() instanceof MojoFailureException) {
@@ -945,6 +1070,18 @@ public class MinifyMojo extends AbstractMojo {
             }
             throw new MojoExecutionException(e.getMessage(), e);
         }
+    }
+
+    private HtmlUpdater createHtmlUpdater() {
+        final var mojoMeta = new MojoMetaImpl(project, getLog(), encoding, buildContext);
+        final var projectBasedir = project.getBasedir();
+        final var resolvedHtmlDir = FileHelper.getAbsoluteFile(projectBasedir, baseHtmlDir, htmlDir);
+        final var resolvedHtmlRoot = FileHelper.getAbsoluteFile(projectBasedir, baseHtmlRoot, htmlRoot);
+        final var resolvedHtmlScriptRoot =
+                FileHelper.getAbsoluteFile(projectBasedir, baseHtmlScriptRoot, htmlScriptRoot);
+        final var updateConfig =
+                new HtmlUpdateConfigImpl(htmlUpdates, resolvedHtmlDir, resolvedHtmlRoot, resolvedHtmlScriptRoot);
+        return new HtmlUpdater(mojoMeta, updateConfig);
     }
 
     private void fillOptionalValues() {
@@ -992,6 +1129,9 @@ public class MinifyMojo extends AbstractMojo {
         }
         if (closureSourceMapLocationMappings == null) {
             closureSourceMapLocationMappings = new ArrayList<>();
+        }
+        if (htmlUpdates == null) {
+            htmlUpdates = new ArrayList<>();
         }
     }
 

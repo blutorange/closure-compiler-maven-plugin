@@ -23,4 +23,9 @@ public class FileSet {
     public List<File> getFiles(File baseDir) {
         return FileHelper.getIncludedFiles(baseDir, getIncludes(), getExcludes());
     }
+
+    @Override
+    public String toString() {
+        return String.format("[includes=%s,excludes=%s]", getIncludes(), getExcludes());
+    }
 }

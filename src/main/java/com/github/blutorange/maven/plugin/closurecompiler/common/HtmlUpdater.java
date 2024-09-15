@@ -13,6 +13,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Range;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
@@ -69,7 +70,9 @@ public final class HtmlUpdater {
         } else {
             try {
                 final var hasChanges = TextFileModifications.applyAndWrite(htmlFile, encoding, modifications);
-                log.info("Updated HTML file <" + htmlFile + ">");
+                if (hasChanges) {
+                    log.info("Updated HTML file <" + htmlFile + ">");
+                }
             } catch (final Exception e) {
                 throw new MojoExecutionException("Failed to apply modifications to <" + htmlFile + ">", e);
             }
@@ -124,6 +127,10 @@ public final class HtmlUpdater {
         }
         final var modifications = new ArrayList<TextFileModification>();
         for (final var script : scripts) {
+            if (log.isDebugEnabled()) {
+                log.debug("Updating script element " + script + " at position "
+                        + formatPosition(script.sourceRange().start()));
+            }
             for (final var attributeName : htmlUpdate.getAttributes()) {
                 final var isHtml = isHtml(document.location());
                 final var modification = HtmlModifier.setAttribute(script, attributeName, sourcePath, isHtml);
@@ -138,14 +145,15 @@ public final class HtmlUpdater {
     private Elements findScripts(HtmlUpdate htmlUpdate, Document document) {
         final var selector = htmlUpdate.getScripts();
         if (selector.isEmpty()) {
-            return document.getElementsByTag("SCRIPT");
+            final var scripts = document.getElementsByTag("SCRIPT");
+            return scripts.isEmpty() ? scripts : new Elements(scripts.get(0));
         }
         final var colon = selector.indexOf(':');
         if (colon < 1) {
             log.warn("Invalid selector <" + selector + ">, must starts with a type (<id:>, <css:>, or <xpath:>)");
             return new Elements();
         }
-        final var type = selector.substring(0, colon - 1);
+        final var type = selector.substring(0, colon);
         final var value = selector.substring(colon + 1);
         switch (type) {
             case "id":
@@ -215,5 +223,9 @@ public final class HtmlUpdater {
                     + htmlUpdate.getHtmlFiles());
         }
         return htmlFiles;
+    }
+
+    private static String formatPosition(Range.Position position) {
+        return position.lineNumber() + ":" + position.columnNumber();
     }
 }

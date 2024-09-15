@@ -895,8 +895,8 @@ public class MinifyMojo extends AbstractMojo {
      *       replaced with the path of the current file, relative to the {@code sourceDir}.
      * </ul>
      *
-     * <p>If merging files, by default the basename is set to {@code script} and the extension to {@code js}, so that
-     * the resulting merged file is called {@code script.min.js}.
+     * <p>If merging files, by default the basename is set to <code>script</code> and the extension to
+     * <script>js</script>, so that the resulting merged file is called {@code script.min.js}.
      *
      * @since 2.0.0
      */

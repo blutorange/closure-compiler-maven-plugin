@@ -3,7 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.blutorange</groupId>
 	<artifactId>closure-compiler-maven-plugin-test-html-update</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -17,27 +16,62 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-html-files</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/test/template_builder/web/html</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/src/main/resources/web/html</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>com.github.blutorange</groupId>
 				<artifactId>closure-compiler-maven-plugin</artifactId>
 				<configuration>
-					<baseSourceDir>${project.basedir}</baseSourceDir>
-					<baseTargetDir>${project.build.directory}/generated-resources</baseTargetDir>
-					<targetDir>web/js</targetDir>
+					<baseSourceDir>${project.basedir}/test/web/js</baseSourceDir>
+					<baseTargetDir>${project.build.directory}/test/node_js/web/js</baseTargetDir>
+					<baseHtmlDir>${project.build.directory}/test</baseHtmlDir>
+					<baseHtmlRoot>${project.build.directory}/test/template_builder</baseHtmlRoot>
+					<baseHtmlScriptRoot>${project.build.directory}/test/node_js</baseHtmlScriptRoot>
 				</configuration>
 				<executions>
 					<execution>
 						<id>default-minify</id>
-						<goals>
-							<goal>minify</goal>
-						</goals>
+						<goals><goal>minify</goal></goals>
 						<configuration>
-							<includes>
-								<include>**/hello1.js</include>
-							</includes>
-							<outputFilename>script1.min.js</outputFilename>
+							<sourceDir>pageBasic</sourceDir>
+							<targetDir>pageBasic</targetDir>
+							<outputFilename>page-basic.min.js</outputFilename>
 							<htmlUpdates>
 								<htmlUpdate>
-									<htmlDir>web/html/page1</htmlDir>
+									<htmlDir>template_builder/web/html/pageBasic</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<execution>
+						<id>selector-id</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageScriptSelector/id</sourceDir>
+							<targetDir>pageScriptSelector/id</targetDir>
+							<outputFilename>page-selector-id.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<scripts>id:target2</scripts>
+									<htmlDir>template_builder/web/html/pageScriptSelector/id</htmlDir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>

@@ -55,23 +55,23 @@ public class MinifyMojoTest {
         }
     }
 
-    private Logger LOG = Logger.getLogger(MinifyMojoTest.class.getCanonicalName());
+    private final Logger LOG = Logger.getLogger(MinifyMojoTest.class.getCanonicalName());
 
     @RegisterExtension
     final TestResources5 testResources = new TestResources5("src/test/resources/projects", "target/test-projects");
 
     private void assertDirContent(File basedir) {
-        File expected = new File(basedir, "expected");
-        File actual = new File(new File(basedir, "target"), "test");
-        Map<String, File> expectedFiles = expected.exists() ? listFiles(expected) : new HashMap<>();
-        Map<String, File> actualFiles = actual.exists() ? listFiles(actual) : new HashMap<>();
+        var expected = new File(basedir, "expected");
+        var actual = new File(new File(basedir, "target"), "test");
+        var expectedFiles = expected.exists() ? listFiles(expected) : new HashMap<String, File>();
+        var actualFiles = actual.exists() ? listFiles(actual) : new HashMap<String, File>();
         LOG.info("Comparing actual files [\n"
                 + actualFiles.values().stream().map(File::getAbsolutePath).collect(Collectors.joining(",\n")) + "\n]");
         LOG.info("to the expected files [\n"
                 + expectedFiles.values().stream().map(File::getAbsolutePath).collect(Collectors.joining(",\n"))
                 + "\n]");
-        assertTrue(
-                expectedFiles.size() > 0,
+        assertFalse(
+                expectedFiles.isEmpty(),
                 "There must be at least one expected file. Add a file 'nofiles' if you expect there to be no files");
         if (expectedFiles.size() == 1
                 && "nofiles".equals(expectedFiles.values().iterator().next().getName())) {
@@ -81,12 +81,14 @@ public class MinifyMojoTest {
             assertEquals(
                     expectedFiles.size(),
                     actualFiles.size(),
-                    "Number of expected files must match the number of produced files");
+                    "Number of expected files must match the number of produced files. Actual files are <"
+                            + actualFiles.values() + ">, expected files are <" + expectedFiles.values() + ">.");
             assertTrue(
                     CollectionUtils.isEqualCollection(expectedFiles.keySet(), actualFiles.keySet()),
-                    "Expected file names must match the produced file names");
+                    "Expected file names must match the produced file names. Actual files are <" + actualFiles.values()
+                            + ">, expected files are <" + expectedFiles.values() + ">.");
             expectedFiles.forEach((key, expectedFile) -> {
-                File actualFile = actualFiles.get(key);
+                var actualFile = actualFiles.get(key);
                 try {
                     compareFiles(expectedFile, actualFile);
                 } catch (IOException e) {
@@ -97,7 +99,7 @@ public class MinifyMojoTest {
     }
 
     private void clean(File basedir) throws IOException {
-        File target = new File(basedir, "target");
+        var target = new File(basedir, "target");
         if (target.exists()) {
             FileUtils.forceDelete(target);
         }
@@ -105,8 +107,8 @@ public class MinifyMojoTest {
     }
 
     private void compareFiles(File expectedFile, File actualFile) throws IOException {
-        List<String> expectedLines = FileUtils.readLines(expectedFile, UTF_8);
-        List<String> actualLines = FileUtils.readLines(actualFile, UTF_8);
+        var expectedLines = FileUtils.readLines(expectedFile, UTF_8);
+        var actualLines = FileUtils.readLines(actualFile, UTF_8);
         assertTrue(
                 expectedFile.exists(),
                 "File with expected content does not exist: '" + actualFile.getAbsolutePath() + "'");
@@ -117,8 +119,8 @@ public class MinifyMojoTest {
         expectedLines.removeIf(StringUtils::isBlank);
         actualLines.removeIf(StringUtils::isBlank);
         // Check file contents
-        assertTrue(
-                expectedLines.size() > 0,
+        assertFalse(
+                expectedLines.isEmpty(),
                 "Expected file must contain at least one non-empty line: '" + actualFile.getAbsolutePath() + "'");
         assertEquals(
                 expectedLines.size(),
@@ -195,7 +197,7 @@ public class MinifyMojoTest {
     }
 
     private void runMinifyAndAssertDirContent(String projectName, Collection<String> profiles) throws Exception {
-        File basedir = testResources.getBasedir(projectName).getCanonicalFile();
+        var basedir = testResources.getBasedir(projectName).getCanonicalFile();
         runMinify(projectName, profiles);
         assertDirContent(basedir);
     }
@@ -238,11 +240,15 @@ public class MinifyMojoTest {
     @Test
     public void testExterns() throws Exception {
         // No externs declared, variable cannot be found, so minification should fail
-        expectError(
-                AssertionError.class, () -> runMinifyAndAssertDirContent("externs", Arrays.asList("without-externs")));
+        expectError(AssertionError.class, () -> runMinifyAndAssertDirContent("externs", List.of("without-externs")));
 
         // Externs declared, variable can be found, so minification should succeed
-        runMinifyAndAssertDirContent("externs", Arrays.asList("createOlderFile", "with-externs"));
+        runMinifyAndAssertDirContent("externs", List.of("createOlderFile", "with-externs"));
+    }
+
+    @Test
+    public void testHtmlUpdate() throws Exception {
+        runMinifyAndAssertDirContent("htmlUpdate");
     }
 
     @Test
@@ -314,11 +320,11 @@ public class MinifyMojoTest {
 
     @Test
     public void testSkipIfExists() throws Exception {
-        // Output file does not exists, minification should run
-        expectError(AssertionError.class, () -> runMinifyAndAssertDirContent("skipif", Arrays.asList("skipIfExists")));
+        // Output file does not exist, minification should run
+        expectError(AssertionError.class, () -> runMinifyAndAssertDirContent("skipif", List.of("skipIfExists")));
 
-        // This create the (older) output file, so the minification process should not run
-        runMinifyAndAssertDirContent("skipif", Arrays.asList("createOlderFile", "skipIfExists"));
+        // This creates the (older) output file, so the minification process should not run
+        runMinifyAndAssertDirContent("skipif", List.of("createOlderFile", "skipIfExists"));
 
         // Now force is enabled, minification should run
         expectError(
@@ -329,10 +335,10 @@ public class MinifyMojoTest {
 
     @Test
     public void testSkipIfNewer() throws Exception {
-        // Output file does not exists, minification should run
-        expectError(AssertionError.class, () -> runMinifyAndAssertDirContent("skipif", Arrays.asList("skipIfNewer")));
+        // Output file does not exist, minification should run
+        expectError(AssertionError.class, () -> runMinifyAndAssertDirContent("skipif", List.of("skipIfNewer")));
 
-        // This create the newer output file, so the minification process should not run
+        // This creates the newer output file, so the minification process should not run
         runMinifyAndAssertDirContent("skipif", Arrays.asList("createNewerFile", "skipIfNewer"));
 
         // Now force is enabled, minification should run

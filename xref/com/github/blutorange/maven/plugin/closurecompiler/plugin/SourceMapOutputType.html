@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="" lang="">
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>SourceMapOutputType xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../../../apidocs/com/github/blutorange/maven/plugin/closurecompiler/plugin/SourceMapOutputType.html">View Javadoc</a></div><pre>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <strong class="jxr_keyword">package</strong> com.github.blutorange.maven.plugin.closurecompiler.plugin;
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <strong class="jxr_keyword">public</strong> enum <a name="SourceMapOutputType" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/plugin/SourceMapOutputType.html#SourceMapOutputType">SourceMapOutputType</a> {
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>       <em class="jxr_javadoccomment">/** Just create a source map file named *.map. */</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>       file(<strong class="jxr_keyword">true</strong>),
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>       <em class="jxr_javadoccomment">/** Inline the content of the source map in the minified file. */</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>       inline(false),
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>       <em class="jxr_javadoccomment">/** Create a source map file *.map and add a reference to it in the minified file. */</em>
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>       reference(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> createFile;
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>      <a name="SourceMapOutputType" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/plugin/SourceMapOutputType.html#SourceMapOutputType">SourceMapOutputType</a>(<strong class="jxr_keyword">boolean</strong> createFile) {
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>          <strong class="jxr_keyword">this</strong>.createFile = createFile;
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>      }
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isCreateFile() {
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>          <strong class="jxr_keyword">return</strong> createFile;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>      }
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  }
+</pre>
+<hr/>
+<div id="footer">© 2009–2024 <a href="http://github.com/blutorange">Andre Wachsmuth</a></div>
+</body>
+</html>

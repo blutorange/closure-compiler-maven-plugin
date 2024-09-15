@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.github.blutorange.maven.plugin.closurecompiler.common"},{"l":"com.github.blutorange.maven.plugin.closurecompiler.plugin"},{"l":"com.github.blutorange.maven.plugin.closurecompiler.shared"}];updateSearchResults();

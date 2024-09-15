@@ -1,13 +1,23 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.absoluteFileToCanonicalFile;
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.getAbsoluteFile;
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.relativizePath;
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.relativizeRelativePath;
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.startsWithBom;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
+import static org.apache.commons.lang3.StringUtils.startsWith;
+
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdate;
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdateConfig;
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.MojoMetadata;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.jsoup.Jsoup;
@@ -28,6 +38,26 @@ public final class HtmlUpdater {
 
     private static Elements toElements(Element element) {
         return element != null ? new Elements(element) : new Elements();
+    }
+
+    private static boolean isHtml(File file) {
+        return isHtml(file.getName());
+    }
+
+    private static boolean isHtml(String file) {
+        final var extension = getExtension(file);
+        return "html".equals(extension) || "htm".equals(extension);
+    }
+
+    private static String formatPosition(Range.Position position) {
+        return position.lineNumber() + ":" + position.columnNumber();
+    }
+
+    private static String toWebPath(String relativePath) {
+        final var unixRelativePath = separatorsToUnix(relativePath);
+        return new File(unixRelativePath).isAbsolute() || startsWith(unixRelativePath, ".")
+                ? unixRelativePath
+                : "./" + unixRelativePath;
     }
 
     public void process(List<ProcessingResult> processingResults) throws MojoExecutionException {
@@ -63,13 +93,14 @@ public final class HtmlUpdater {
         applyModifications(htmlFile, encoding, modifications);
     }
 
-    private void applyModifications(File htmlFile, Charset encoding, ArrayList<TextFileModification> modifications)
+    private void applyModifications(File htmlFile, Charset encoding, List<TextFileModification> modifications)
             throws MojoExecutionException {
         if (modifications.isEmpty()) {
             log.info("HTML file <" + htmlFile + "> is already up-to-date");
         } else {
             try {
-                final var hasChanges = TextFileModifications.applyAndWrite(htmlFile, encoding, modifications);
+                final var adjustedModifications = adjustModifications(htmlFile, encoding, modifications);
+                final var hasChanges = TextFileModifications.applyAndWrite(htmlFile, encoding, adjustedModifications);
                 if (hasChanges) {
                     log.info("Updated HTML file <" + htmlFile + ">");
                 }
@@ -79,10 +110,22 @@ public final class HtmlUpdater {
         }
     }
 
+    private List<TextFileModification> adjustModifications(
+            File htmlFile, Charset encoding, List<TextFileModification> modifications) throws IOException {
+        final var startsWithBom = startsWithBom(htmlFile, encoding);
+        if (startsWithBom) {
+            return modifications.stream()
+                    .map(modification -> modification.withOffset(1))
+                    .collect(toList());
+        } else {
+            return modifications;
+        }
+    }
+
     private List<TextFileModification> processProcessingResult(
             ProcessingResult processingResult, HtmlUpdate htmlUpdate, Document htmlDocument, String relativeHtmlPath)
             throws MojoExecutionException {
-        final var scriptFile = FileHelper.absoluteFileToCanonicalFile(processingResult.getOutput());
+        final var scriptFile = absoluteFileToCanonicalFile(processingResult.getOutput());
         final var relativeScriptPath = relativizeScriptFile(htmlUpdate, scriptFile);
         final var resolvedSourcePath = resolveSourcePath(htmlUpdate, relativeHtmlPath, relativeScriptPath, scriptFile);
         return updateHtmlFile(htmlUpdate, htmlDocument, resolvedSourcePath);
@@ -91,13 +134,16 @@ public final class HtmlUpdater {
     private String resolveSourcePath(
             HtmlUpdate htmlUpdate, String relativeHtmlPath, String relativeScriptPath, File scriptFile) {
         if (htmlUpdate.getSourcePath().isEmpty()) {
-            return FileHelper.relativizePath(new File(relativeHtmlPath).getParentFile(), new File(relativeScriptPath));
+            final var relativeHtmlDirPath = new File(relativeHtmlPath).getParentFile();
+            final var relativePath = relativizeRelativePath(relativeHtmlDirPath, new File(relativeScriptPath));
+            return toWebPath(relativePath);
         } else {
             final var interpolator = new FilenameInterpolator(htmlUpdate.getSourcePath());
             final var scriptBaseDir = "/".equals(htmlUpdate.getHtmlScriptRoot())
                     ? scriptFile
-                    : FileHelper.getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getHtmlScriptRoot());
-            return interpolator.interpolateRelative(scriptFile, scriptBaseDir);
+                    : getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getHtmlScriptRoot());
+            final var path = interpolator.interpolateRelative(scriptFile, scriptBaseDir);
+            return separatorsToUnix(path);
         }
     }
 
@@ -105,17 +151,16 @@ public final class HtmlUpdater {
         if ("/".equals(htmlUpdate.getHtmlRoot())) {
             return htmlFile.getPath();
         }
-        final var htmlRoot = FileHelper.getAbsoluteFile(updateConfig.getHtmlRoot(), htmlUpdate.getHtmlRoot());
-        return FileHelper.relativizePath(htmlRoot, htmlFile);
+        final var htmlRoot = getAbsoluteFile(updateConfig.getHtmlRoot(), htmlUpdate.getHtmlRoot());
+        return relativizePath(htmlRoot, htmlFile);
     }
 
     private String relativizeScriptFile(HtmlUpdate htmlUpdate, File scriptFile) throws MojoExecutionException {
         if ("/".equals(htmlUpdate.getHtmlScriptRoot())) {
             return scriptFile.getPath();
         }
-        final var htmlScriptRoot =
-                FileHelper.getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getHtmlScriptRoot());
-        return FileHelper.relativizePath(htmlScriptRoot, scriptFile);
+        final var htmlScriptRoot = getAbsoluteFile(updateConfig.getHtmlScriptRoot(), htmlUpdate.getHtmlScriptRoot());
+        return relativizePath(htmlScriptRoot, scriptFile);
     }
 
     private List<TextFileModification> updateHtmlFile(HtmlUpdate htmlUpdate, Document document, String sourcePath) {
@@ -133,9 +178,13 @@ public final class HtmlUpdater {
             }
             for (final var attributeName : htmlUpdate.getAttributes()) {
                 final var isHtml = isHtml(document.location());
-                final var modification = HtmlModifier.setAttribute(script, attributeName, sourcePath, isHtml);
-                if (modification != null) {
-                    modifications.add(modification);
+                final var setAttribute = HtmlModifier.setAttribute(script, attributeName, sourcePath, isHtml);
+                final var clearTextContent = HtmlModifier.clearTextContent(script);
+                if (setAttribute != null) {
+                    modifications.add(setAttribute);
+                }
+                if (clearTextContent != null) {
+                    modifications.add(clearTextContent);
                 }
             }
         }
@@ -206,26 +255,13 @@ public final class HtmlUpdater {
         }
     }
 
-    private static boolean isHtml(File file) {
-        return isHtml(file.getName());
-    }
-
-    private static boolean isHtml(String file) {
-        final var extension = FilenameUtils.getExtension(file);
-        return "html".equals(extension) || "htm".equals(extension);
-    }
-
     private List<File> resolveHtmlFiles(HtmlUpdate htmlUpdate) {
-        final var base = FileHelper.getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getHtmlDir());
+        final var base = getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getHtmlDir());
         final var htmlFiles = htmlUpdate.getHtmlFiles().getFiles(base);
         if (htmlFiles.isEmpty()) {
             log.warn("Did not find any HTML files to update in directory <" + base + "> with "
                     + htmlUpdate.getHtmlFiles());
         }
         return htmlFiles;
-    }
-
-    private static String formatPosition(Range.Position position) {
-        return position.lineNumber() + ":" + position.columnNumber();
     }
 }

@@ -1,0 +1,2 @@
+expected/template_builder/web/html/pageHtmlEncoding/index-page-html-encoding.html=UTF-16BE
+src/main/resources/web/html/pageHtmlEncoding/index-page-html-encoding.html=UTF-16BE

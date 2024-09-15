@@ -7,6 +7,20 @@ import java.util.Objects;
 import org.jsoup.nodes.Element;
 
 final class HtmlModifier {
+    public static TextFileModification clearTextContent(Element element) {
+        final var selfClosed = element.sourceRange().equals(element.endSourceRange());
+        if (selfClosed || element.childNodeSize() == 0) {
+            return null;
+        }
+        final var firstChildSourceRange = element.childNode(0).sourceRange();
+        final var lastChild = element.childNode(element.childNodeSize() - 1);
+        final var lastChildSourceRange =
+                lastChild instanceof Element ? ((Element) lastChild).endSourceRange() : lastChild.sourceRange();
+        final var from = firstChildSourceRange.startPos();
+        final var to = lastChildSourceRange.endPos();
+        return to > from ? new TextFileModification(from, to, "") : null;
+    }
+
     public static TextFileModification setAttribute(Element element, String name, String newValue, boolean html) {
         final var escapedValue = html ? forHtmlAttribute(newValue) : forXmlAttribute(newValue);
         final var attributes = element.attributes();

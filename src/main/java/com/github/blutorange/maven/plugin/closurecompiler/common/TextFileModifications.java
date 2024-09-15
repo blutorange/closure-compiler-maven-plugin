@@ -16,7 +16,7 @@ final class TextFileModifications {
             throws IOException {
         final var textContent = FileUtils.readFileToString(file, encoding);
         final var modifiedContent = apply(textContent, modifications);
-        final var hasChanges = !Objects.equals(textContent, modifications);
+        final var hasChanges = !Objects.equals(textContent, modifiedContent);
         if (hasChanges) {
             FileUtils.writeStringToFile(file, modifiedContent, encoding);
         }

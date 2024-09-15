@@ -22,4 +22,8 @@ final class TextFileModification {
     public int getEndPosition() {
         return endPosition;
     }
+
+    public TextFileModification withOffset(int offset) {
+        return new TextFileModification(startPosition + offset, endPosition + offset, replacement);
+    }
 }

@@ -12,6 +12,9 @@
  */
 package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.absoluteFileToCanonicalFile;
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.getAbsoluteFile;
+
 import com.github.blutorange.maven.plugin.closurecompiler.common.*;
 import com.google.gson.Gson;
 import com.google.javascript.jscomp.CompilationLevel;
@@ -1075,10 +1078,11 @@ public class MinifyMojo extends AbstractMojo {
     private HtmlUpdater createHtmlUpdater() {
         final var mojoMeta = new MojoMetaImpl(project, getLog(), encoding, buildContext);
         final var projectBasedir = project.getBasedir();
-        final var resolvedHtmlDir = FileHelper.getAbsoluteFile(projectBasedir, baseHtmlDir, htmlDir);
-        final var resolvedHtmlRoot = FileHelper.getAbsoluteFile(projectBasedir, baseHtmlRoot, htmlRoot);
+        final var resolvedHtmlDir = absoluteFileToCanonicalFile(getAbsoluteFile(projectBasedir, baseHtmlDir, htmlDir));
+        final var resolvedHtmlRoot =
+                absoluteFileToCanonicalFile(getAbsoluteFile(projectBasedir, baseHtmlRoot, htmlRoot));
         final var resolvedHtmlScriptRoot =
-                FileHelper.getAbsoluteFile(projectBasedir, baseHtmlScriptRoot, htmlScriptRoot);
+                absoluteFileToCanonicalFile(getAbsoluteFile(projectBasedir, baseHtmlScriptRoot, htmlScriptRoot));
         final var updateConfig =
                 new HtmlUpdateConfigImpl(htmlUpdates, resolvedHtmlDir, resolvedHtmlRoot, resolvedHtmlScriptRoot);
         return new HtmlUpdater(mojoMeta, updateConfig);
@@ -1141,7 +1145,7 @@ public class MinifyMojo extends AbstractMojo {
         }
         AggregationConfiguration aggregationConfiguration;
         try (Reader bundleConfigurationReader =
-                new FileReader(FileHelper.getAbsoluteFile(project.getBasedir(), bundleConfiguration))) {
+                new FileReader(getAbsoluteFile(project.getBasedir(), bundleConfiguration))) {
             aggregationConfiguration = new Gson().fromJson(bundleConfigurationReader, AggregationConfiguration.class);
         } catch (IOException e) {
             throw new MojoFailureException(

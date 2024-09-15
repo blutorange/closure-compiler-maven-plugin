@@ -1,7 +1,9 @@
 package com.github.blutorange.maven.plugin.closurecompiler.test;
 
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.cli.MavenCli;
@@ -35,6 +39,32 @@ public class MinifyMojoTest {
 
     protected interface Action {
         void run() throws Throwable;
+    }
+
+    private static class EncodingProvider {
+        private final File basedir;
+        private final Map<String, Charset> encodingMap = new HashMap<>();
+
+        EncodingProvider(File basedir) throws IOException {
+            this.basedir = basedir;
+            var encodingData = new File(basedir, "encoding.txt");
+            if (encodingData.exists()) {
+                var encodingLines = FileUtils.readLines(encodingData, UTF_8);
+                for (var encodingLine : encodingLines) {
+                    var parts = encodingLine.split("=");
+                    if (parts.length == 2) {
+                        var relativePath = parts[0];
+                        var encoding = Charset.forName(parts[1]);
+                        encodingMap.put(relativePath, encoding);
+                    }
+                }
+            }
+        }
+
+        public Charset determineEncoding(File file) {
+            var relativePath = relativizePath(basedir, file);
+            return encodingMap.getOrDefault(relativePath, UTF_8);
+        }
     }
 
     private static class MavenResult {
@@ -60,7 +90,7 @@ public class MinifyMojoTest {
     @RegisterExtension
     final TestResources5 testResources = new TestResources5("src/test/resources/projects", "target/test-projects");
 
-    private void assertDirContent(File basedir) {
+    private void assertDirContent(File basedir) throws IOException {
         var expected = new File(basedir, "expected");
         var actual = new File(new File(basedir, "target"), "test");
         var expectedFiles = expected.exists() ? listFiles(expected) : new HashMap<String, File>();
@@ -73,6 +103,7 @@ public class MinifyMojoTest {
         assertFalse(
                 expectedFiles.isEmpty(),
                 "There must be at least one expected file. Add a file 'nofiles' if you expect there to be no files");
+        var encodingProvider = new EncodingProvider(basedir);
         if (expectedFiles.size() == 1
                 && "nofiles".equals(expectedFiles.values().iterator().next().getName())) {
             // Expect there to be no output files
@@ -81,21 +112,40 @@ public class MinifyMojoTest {
             assertEquals(
                     expectedFiles.size(),
                     actualFiles.size(),
-                    "Number of expected files must match the number of produced files. Actual files are <"
-                            + actualFiles.values() + ">, expected files are <" + expectedFiles.values() + ">.");
+                    "Number of expected files must match the number of produced files. "
+                            + diffFiles(basedir, expectedFiles, actualFiles));
             assertTrue(
                     CollectionUtils.isEqualCollection(expectedFiles.keySet(), actualFiles.keySet()),
-                    "Expected file names must match the produced file names. Actual files are <" + actualFiles.values()
-                            + ">, expected files are <" + expectedFiles.values() + ">.");
+                    "Expected file names must match the produced file names. "
+                            + diffFiles(basedir, expectedFiles, actualFiles));
             expectedFiles.forEach((key, expectedFile) -> {
                 var actualFile = actualFiles.get(key);
                 try {
-                    compareFiles(expectedFile, actualFile);
+                    compareFiles(expectedFile, actualFile, encodingProvider);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             });
         }
+    }
+
+    private static String diffFiles(File basedir, Map<String, File> expectedFiles, Map<String, File> actualFiles) {
+        final var testDir = new File(basedir, "target/test");
+        final var expectedButNotPresent = SetUtils.difference(expectedFiles.keySet(), actualFiles.keySet()).stream()
+                .map(x -> new File(testDir, x))
+                .map(FileHelper::absoluteFileToCanonicalFile)
+                .collect(toList());
+        final var presentButNotExpected = SetUtils.difference(actualFiles.keySet(), expectedFiles.keySet()).stream()
+                .map(actualFiles::get)
+                .collect(toList());
+        final var messages = new ArrayList<String>();
+        if (!expectedButNotPresent.isEmpty()) {
+            messages.add("Expected files that are not present: <" + expectedButNotPresent + ">.");
+        }
+        if (!presentButNotExpected.isEmpty()) {
+            messages.add("Present files that were not expected to be present: <" + presentButNotExpected + ">");
+        }
+        return String.join(" ", messages);
     }
 
     private void clean(File basedir) throws IOException {
@@ -106,9 +156,11 @@ public class MinifyMojoTest {
         assertFalse(target.exists());
     }
 
-    private void compareFiles(File expectedFile, File actualFile) throws IOException {
-        var expectedLines = FileUtils.readLines(expectedFile, UTF_8);
-        var actualLines = FileUtils.readLines(actualFile, UTF_8);
+    private void compareFiles(File expectedFile, File actualFile, EncodingProvider encodingProvider)
+            throws IOException {
+        var encoding = encodingProvider.determineEncoding(expectedFile);
+        var expectedLines = FileUtils.readLines(expectedFile, encoding);
+        var actualLines = FileUtils.readLines(actualFile, encoding);
         assertTrue(
                 expectedFile.exists(),
                 "File with expected content does not exist: '" + actualFile.getAbsolutePath() + "'");
@@ -169,7 +221,7 @@ public class MinifyMojoTest {
 
     private Map<String, File> listFiles(File basedir) {
         return FileUtils.listFiles(basedir, null, true).stream()
-                .collect(Collectors.toMap(file -> FileHelper.relativizePath(basedir, file), identity()));
+                .collect(Collectors.toMap(file -> relativizePath(basedir, file), identity()));
     }
 
     private MavenResult runMinify(String projectName) throws Exception {

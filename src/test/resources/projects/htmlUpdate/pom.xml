@@ -47,6 +47,7 @@
 					<baseHtmlScriptRoot>${project.build.directory}/test/node_js</baseHtmlScriptRoot>
 				</configuration>
 				<executions>
+					<!-- Tests the basic HTML update feature works  -->
 					<execution>
 						<id>default-minify</id>
 						<goals><goal>minify</goal></goals>
@@ -61,6 +62,7 @@
 							</htmlUpdates>
 						</configuration>
 					</execution>
+					<!-- Tests that we can select the target script element via its ID  -->
 					<execution>
 						<id>selector-id</id>
 						<goals><goal>minify</goal></goals>
@@ -72,6 +74,167 @@
 								<htmlUpdate>
 									<scripts>id:target2</scripts>
 									<htmlDir>template_builder/web/html/pageScriptSelector/id</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can select the target script element via a CSS selector  -->
+					<execution>
+						<id>selector-css</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageScriptSelector/css</sourceDir>
+							<targetDir>pageScriptSelector/css</targetDir>
+							<outputFilename>page-selector-css.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<scripts>css:.target2[type=module]</scripts>
+									<htmlDir>template_builder/web/html/pageScriptSelector/css</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can select the target script element via an XPath  -->
+					<execution>
+						<id>selector-xpath</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageScriptSelector/xpath</sourceDir>
+							<targetDir>pageScriptSelector/xpath</targetDir>
+							<outputFilename>page-selector-xpath.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<scripts>xpath://script[contains(text(), "target2")]</scripts>
+									<htmlDir>template_builder/web/html/pageScriptSelector/xpath</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can configure the attributes that are set to the script file -->
+					<execution>
+						<id>attributes</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageAttributes</sourceDir>
+							<targetDir>pageAttributes</targetDir>
+							<outputFilename>page-attributes.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<attributes>
+										<attribute>src</attribute>
+										<attribute>data-src</attribute>
+									</attributes>
+									<htmlDir>template_builder/web/html/pageAttributes</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can use the physical path of the HTML and script file to derive the relative path -->
+					<execution>
+						<id>physical-path</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pagePhysicalPath</sourceDir>
+							<targetDir>pagePhysicalPath</targetDir>
+							<outputFilename>page-physical-path.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<htmlRoot>/</htmlRoot>
+									<htmlScriptRoot>/</htmlScriptRoot>
+									<htmlDir>template_builder/web/html/pagePhysicalPath</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can use a file name pattern for the script source path -->
+					<execution>
+						<id>source-path</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageSourcePath</sourceDir>
+							<targetDir>pageSourcePath</targetDir>
+							<outputFilename>page-source-path.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<sourcePath>~/some/thing/#{filename}/#{basename}/#{extension}?path=#{path}</sourcePath>
+									<htmlDir>template_builder/web/html/pageSourcePath</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can use specify the encoding of the HTML file(s) -->
+					<execution>
+						<id>html-encoding</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageHtmlEncoding</sourceDir>
+							<targetDir>pageHtmlEncoding</targetDir>
+							<outputFilename>page-html-文字符号化方式.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<htmlEncoding>UTF-16BE</htmlEncoding>
+									<htmlDir>template_builder/web/html/pageHtmlEncoding</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests that we can specify multiple HTML files via includes/excludes -->
+					<execution>
+						<id>html-files</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageHtmlFiles</sourceDir>
+							<targetDir>pageHtmlFiles</targetDir>
+							<outputFilename>page-html-files.min.js</outputFilename>
+							<htmlUpdates>
+								<htmlUpdate>
+									<htmlFiles>
+										<includes>
+											<include>**/index-*.html</include>
+										</includes>
+										<excludes>
+											<exclude>**/*-exclude.html</exclude>
+										</excludes>
+									</htmlFiles>
+									<htmlDir>template_builder/web/html/pageHtmlFiles</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests the htmlRoot and htmlScriptRoot parameters  -->
+					<execution>
+						<id>root-parameter</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageRoot</sourceDir>
+							<targetDir>pageRoot</targetDir>
+							<outputFilename>page-root.min.js</outputFilename>
+							<baseHtmlRoot>target</baseHtmlRoot>
+							<htmlRoot>test/template_builder</htmlRoot>
+							<baseHtmlScriptRoot>target</baseHtmlScriptRoot>
+							<htmlScriptRoot>test/node_js</htmlScriptRoot>
+							<htmlUpdates>
+								<htmlUpdate>
+									<htmlRoot>web/html/pageRoot</htmlRoot>
+									<htmlScriptRoot>web/js/pageRoot</htmlScriptRoot>
+									<htmlDir>template_builder/web/html/pageRoot</htmlDir>
+								</htmlUpdate>
+							</htmlUpdates>
+						</configuration>
+					</execution>
+					<!-- Tests the htmlDir parameter  -->
+					<execution>
+						<id>html-dir</id>
+						<goals><goal>minify</goal></goals>
+						<configuration>
+							<sourceDir>pageHtmlDir</sourceDir>
+							<targetDir>pageHtmlDir</targetDir>
+							<outputFilename>page-html-dir.min.js</outputFilename>
+							<baseHtmlDir>${project.build.directory}</baseHtmlDir>
+							<htmlDir>test/template_builder</htmlDir>
+							<htmlUpdates>
+								<htmlUpdate>
+									<htmlDir>web/html/pageHtmlDir</htmlDir>
 								</htmlUpdate>
 							</htmlUpdates>
 						</configuration>

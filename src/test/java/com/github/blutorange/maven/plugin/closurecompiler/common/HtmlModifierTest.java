@@ -1,10 +1,16 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
+import static com.github.blutorange.maven.plugin.closurecompiler.common.HtmlModifier.clearTextContent;
 import static com.github.blutorange.maven.plugin.closurecompiler.common.HtmlModifier.setAttribute;
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import org.jsoup.Jsoup;
@@ -14,7 +20,27 @@ import org.junit.Test;
 
 public class HtmlModifierTest {
     @Test
-    public void testSetAttribute() {
+    public void testClearTextContent() throws IOException {
+        // <div></div>
+        assertClearTextContent("<div></div>", "<div></div>");
+        assertClearTextContent("<div></div>", "<div>  </div>");
+        assertClearTextContent("<div></div>", "<div>foo</div>");
+
+        // <div/>
+        assertClearTextContent("<div />", "<div />");
+
+        // <div><span></span></div>
+        assertClearTextContent("<div></div>", "<div><span></span></div>");
+        assertClearTextContent("<div></div>", "<div><span></span><span></span></div>");
+        assertClearTextContent("<div></div>", "<div><span>1</span>2<span>3</span></div>");
+        assertClearTextContent("<div></div>", "<div> <span> 1 </span> 2 <span> 3 </span> </div>");
+
+        // <div><span/></div>
+        assertClearTextContent("<div></div>", "<div><span/></div>");
+    }
+
+    @Test
+    public void testSetAttribute() throws IOException {
         // <script></script>
         assertSetAttribute(
                 "<html><body><script src=\"qux\"></script></body></html>",
@@ -232,6 +258,12 @@ public class HtmlModifierTest {
                 "<html><body><script src='foobar'></script></body></html>",
                 "海猫");
 
+        // Byte-order mark
+        assertSetAttribute(
+                "\ufeff<html><body><script src='海猫'></script></body></html>",
+                "\ufeff<html><body><script src='foobar'></script></body></html>",
+                "海猫");
+
         // Unicode characters
         assertSetAttribute(
                 "<html><body><script src='&lt;&#39;&amp;&#34;>'></script></body></html>",
@@ -239,31 +271,60 @@ public class HtmlModifierTest {
                 "<'&\">");
     }
 
-    private void assertSetAttribute(String expected, String inputHtml, String value) {
-        assertReplaces(expected, inputHtml, (element, html) -> setAttribute(element, "src", value, html));
+    private void assertSetAttribute(String expected, String inputHtml, String value) throws IOException {
+        assertReplaces(expected, inputHtml, "script", (element, html) -> setAttribute(element, "src", value, html));
     }
 
-    private void assertReplaces(
-            String expected, String inputHtml, BiFunction<Element, Boolean, TextFileModification> createModification) {
-        assertReplaces(expected, inputHtml, createModification, true);
-        assertReplaces(expected, inputHtml, createModification, false);
+    private void assertClearTextContent(String expected, String inputHtml) throws IOException {
+        assertReplaces(expected, inputHtml, "div", (element, html) -> clearTextContent(element));
     }
 
     private void assertReplaces(
             String expected,
             String inputHtml,
+            String tagName,
+            BiFunction<Element, Boolean, TextFileModification> createModification)
+            throws IOException {
+        assertReplaces(expected, inputHtml, tagName, createModification, UTF_8, true);
+        assertReplaces(expected, inputHtml, tagName, createModification, UTF_8, false);
+        assertReplaces(expected, inputHtml, tagName, createModification, UTF_16BE, true);
+        assertReplaces(expected, inputHtml, tagName, createModification, UTF_16BE, false);
+        assertReplaces(expected, inputHtml, tagName, createModification, UTF_16LE, true);
+        assertReplaces(expected, inputHtml, tagName, createModification, UTF_16LE, false);
+    }
+
+    private void assertReplaces(
+            String expected,
+            String inputHtml,
+            String tagName,
             BiFunction<Element, Boolean, TextFileModification> createModification,
-            boolean html) {
+            Charset encoding,
+            boolean html)
+            throws IOException {
         var parser = html ? Parser.htmlParser() : Parser.xmlParser();
         parser.setTrackErrors(100);
         parser.setTrackPosition(true);
-        var doc = Jsoup.parse(inputHtml, "utf-8", parser);
-        var modifications = doc.select("script").stream()
-                .map(element -> createModification.apply(element, html))
-                .filter(Objects::nonNull)
-                .collect(toList());
-        Collections.reverse(modifications);
-        var actual = TextFileModifications.apply(inputHtml, modifications);
-        assertEquals(expected, actual);
+        try (var input = new ByteArrayInputStream(inputHtml.getBytes(encoding))) {
+            var doc = Jsoup.parse(input, encoding.name(), "mem:file.html", parser);
+            var modifications = doc.select(tagName).stream()
+                    .map(element -> createModification.apply(element, html))
+                    .filter(Objects::nonNull)
+                    .collect(toList());
+            Collections.reverse(modifications);
+            var adjustedModifications = adjustModifications(inputHtml, modifications);
+            var actual = TextFileModifications.apply(inputHtml, adjustedModifications);
+            assertEquals(expected, actual);
+        }
+    }
+
+    private List<TextFileModification> adjustModifications(String inputHtml, List<TextFileModification> modifications) {
+        final var startsWithBom = inputHtml.startsWith("\ufeff");
+        if (startsWithBom) {
+            return modifications.stream()
+                    .map(modification -> modification.withOffset(1))
+                    .collect(toList());
+        } else {
+            return modifications;
+        }
     }
 }

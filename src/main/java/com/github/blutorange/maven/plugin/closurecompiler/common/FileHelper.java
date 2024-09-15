@@ -1,7 +1,10 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -72,7 +75,7 @@ public class FileHelper {
             if (file.isAbsolute()) {
                 result = file;
             } else {
-                result = new File(basedir, file.getPath());
+                result = new File(result, file.getPath());
             }
         }
         return result;
@@ -150,5 +153,14 @@ public class FileHelper {
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         final var seen = new HashSet<>();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public static boolean startsWithBom(File file, Charset encoding) throws IOException {
+        try (final var input = new FileInputStream(file)) {
+            try (final var reader = new InputStreamReader(input, encoding)) {
+                final var firstChar = reader.read();
+                return firstChar == '\ufeff';
+            }
+        }
     }
 }

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.plexus.util.DirectoryScanner;
 
+/** Helper methods for working with files. */
 public class FileHelper {
     private FileHelper() {}
 

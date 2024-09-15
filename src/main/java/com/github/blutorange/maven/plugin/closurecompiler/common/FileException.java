@@ -2,7 +2,7 @@ package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import java.util.ArrayList;
 
-public class FileException extends RuntimeException {
+final class FileException extends RuntimeException {
     private final Iterable<FileMessage> fileErrors;
 
     public FileException(Iterable<FileMessage> fileErrors) {

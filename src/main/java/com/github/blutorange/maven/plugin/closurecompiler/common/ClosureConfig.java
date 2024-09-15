@@ -17,8 +17,10 @@ package com.github.blutorange.maven.plugin.closurecompiler.common;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.ClosureSourceMapLocationMapping;
+import com.github.blutorange.maven.plugin.closurecompiler.plugin.DependencyModeFlag;
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.FileSet;
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.MinifyMojo;
+import com.github.blutorange.maven.plugin.closurecompiler.plugin.SourceMapOutputType;
 import com.google.javascript.jscomp.CheckLevel;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -50,7 +52,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.maven.plugin.MojoFailureException;
 
 /** <a href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a> configuration. */
-public class ClosureConfig {
+public final class ClosureConfig {
 
     private static final String BINARY_PREFIX = "0b";
 

@@ -31,7 +31,7 @@ import org.apache.maven.plugin.logging.Log;
  * that are produced by the enumeration will be read, in order, to provide the bytes to be read from the
  * {@code SequenceInputStream}.
  */
-public class SourceFilesEnumeration implements Enumeration<InputStream> {
+final class SourceFilesEnumeration implements Enumeration<InputStream> {
 
     private final List<InputStreamSupplier> suppliers;
 

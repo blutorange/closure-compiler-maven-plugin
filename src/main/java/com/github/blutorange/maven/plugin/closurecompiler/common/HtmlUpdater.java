@@ -11,8 +11,8 @@ import static org.apache.commons.io.FilenameUtils.separatorsToUnix;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdate;
-import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdateConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.plugin.MojoMetadata;
+import com.github.blutorange.maven.plugin.closurecompiler.shared.HtmlUpdateConfig;
+import com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,10 +29,21 @@ import org.jsoup.nodes.Range;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
+/**
+ * Updates a given set of HTML files and sets the source of the configured script elements the generated files.
+ *
+ * @since 2.32.0
+ */
 public final class HtmlUpdater {
     private final Log log;
     private final HtmlUpdateConfig updateConfig;
 
+    /**
+     * Creates a new update for a minify plugin.
+     *
+     * @param mojoMeta Mojo metadata with the Maven logger.
+     * @param updateConfig Plugin-global configuration for the HTML update operation.
+     */
     public HtmlUpdater(MojoMetadata mojoMeta, HtmlUpdateConfig updateConfig) {
         this.log = mojoMeta.getLog();
         this.updateConfig = updateConfig;
@@ -62,6 +73,12 @@ public final class HtmlUpdater {
                 : "./" + unixRelativePath;
     }
 
+    /**
+     * Update all HTML files with the given generated files.
+     *
+     * @param processingResults Results of the minify plugin, with the generated script files.
+     * @throws MojoExecutionException When the HTML files could not be updated.
+     */
     public void process(List<ProcessingResult> processingResults) throws MojoExecutionException {
         for (final var htmlUpdate : updateConfig.getHtmlUpdates()) {
             processHtmlUpdate(processingResults, htmlUpdate);

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.StringSubstitutor;
 
-public class FilenameInterpolator {
+final class FilenameInterpolator {
     private final String pattern;
     private final String prefix;
     private final String suffix;

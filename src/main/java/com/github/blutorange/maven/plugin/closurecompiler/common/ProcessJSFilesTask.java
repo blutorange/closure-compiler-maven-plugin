@@ -11,16 +11,9 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.github.blutorange.maven.plugin.closurecompiler.plugin;
+package com.github.blutorange.maven.plugin.closurecompiler.common;
 
-import com.github.blutorange.maven.plugin.closurecompiler.common.ClosureCompileFileMessage;
-import com.github.blutorange.maven.plugin.closurecompiler.common.ClosureConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileException;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileProcessConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileSpecifier;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileSystemLocationMapping;
-import com.github.blutorange.maven.plugin.closurecompiler.common.ProcessingResult;
+import com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
 import com.google.javascript.jscomp.CommandLineRunner;
 import com.google.javascript.jscomp.Compiler;
 import com.google.javascript.jscomp.SourceFile;
@@ -45,7 +38,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.MojoFailureException;
 
 /** Task for merging and compressing JavaScript files. */
-public class ProcessJSFilesTask extends ProcessFilesTask {
+public final class ProcessJSFilesTask extends ProcessFilesTask {
 
     /**
      * Task constructor.

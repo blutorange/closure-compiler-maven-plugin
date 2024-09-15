@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-public class FileMessage {
+class FileMessage {
     private final Throwable cause;
 
     private final int column;

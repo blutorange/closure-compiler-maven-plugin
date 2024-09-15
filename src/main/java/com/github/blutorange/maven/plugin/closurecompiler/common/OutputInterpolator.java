@@ -21,7 +21,7 @@ import org.apache.commons.text.StringEscapeUtils;
  *
  * @author madgaksha
  */
-public final class OutputInterpolator implements UnaryOperator<String> {
+final class OutputInterpolator implements UnaryOperator<String> {
 
     private static final Pattern PATTERN = Pattern.compile("%output%|%output\\|jsstring%");
 

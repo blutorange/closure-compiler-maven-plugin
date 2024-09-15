@@ -1,4 +1,4 @@
-package com.github.blutorange.maven.plugin.closurecompiler.common;
+package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
 import com.google.javascript.jscomp.DependencyOptions.DependencyMode;
 

@@ -1,5 +1,6 @@
-package com.github.blutorange.maven.plugin.closurecompiler.plugin;
+package com.github.blutorange.maven.plugin.closurecompiler.shared;
 
+import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdate;
 import java.io.File;
 import java.util.List;
 

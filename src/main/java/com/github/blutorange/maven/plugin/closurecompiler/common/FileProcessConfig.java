@@ -2,7 +2,7 @@ package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.SkipMode;
 
-public class FileProcessConfig {
+public final class FileProcessConfig {
     private final boolean skipMerge;
     private final boolean skipMinify;
     private final boolean force;

@@ -11,18 +11,12 @@
  * OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package com.github.blutorange.maven.plugin.closurecompiler.plugin;
+package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import static java.io.OutputStream.nullOutputStream;
 
-import com.github.blutorange.maven.plugin.closurecompiler.common.ClosureConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileException;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileProcessConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FileSpecifier;
-import com.github.blutorange.maven.plugin.closurecompiler.common.FilenameInterpolator;
-import com.github.blutorange.maven.plugin.closurecompiler.common.ProcessingResult;
-import com.github.blutorange.maven.plugin.closurecompiler.common.SourceFilesEnumeration;
+import com.github.blutorange.maven.plugin.closurecompiler.plugin.SkipMode;
+import com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;

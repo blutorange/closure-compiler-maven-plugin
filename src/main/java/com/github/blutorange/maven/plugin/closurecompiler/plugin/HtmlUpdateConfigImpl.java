@@ -1,11 +1,10 @@
-package com.github.blutorange.maven.plugin.closurecompiler.common;
+package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
-import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdate;
-import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdateConfig;
+import com.github.blutorange.maven.plugin.closurecompiler.shared.HtmlUpdateConfig;
 import java.io.File;
 import java.util.List;
 
-public final class HtmlUpdateConfigImpl implements HtmlUpdateConfig {
+final class HtmlUpdateConfigImpl implements HtmlUpdateConfig {
     private final List<HtmlUpdate> htmlUpdates;
     private final File htmlDir;
     private final File htmlRoot;

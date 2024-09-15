@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 
 /** Makes the source file relative to the location of the source map. The paths are taken from the file system. */
-public class FileSystemLocationMapping implements LocationMapping {
+final class FileSystemLocationMapping implements LocationMapping {
     private final File baseDirForSourceFiles;
     private final File sourceMapDir;
     private final Log log;

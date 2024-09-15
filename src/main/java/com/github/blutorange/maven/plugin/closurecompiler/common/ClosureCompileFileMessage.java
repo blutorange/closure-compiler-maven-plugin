@@ -7,7 +7,7 @@ import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-public class ClosureCompileFileMessage extends FileMessage {
+final class ClosureCompileFileMessage extends FileMessage {
     private ClosureCompileFileMessage(File file, int line, int column, String message, int severity, Throwable cause) {
         super(file, line, column, message, severity, cause);
     }

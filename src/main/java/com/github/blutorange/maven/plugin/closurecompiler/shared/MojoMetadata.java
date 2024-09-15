@@ -1,4 +1,4 @@
-package com.github.blutorange.maven.plugin.closurecompiler.plugin;
+package com.github.blutorange.maven.plugin.closurecompiler.shared;
 
 import java.nio.charset.Charset;
 import org.apache.maven.plugin.logging.Log;

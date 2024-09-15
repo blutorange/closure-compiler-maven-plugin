@@ -3,7 +3,7 @@ package com.github.blutorange.maven.plugin.closurecompiler.common;
 import java.io.File;
 import java.util.List;
 
-public class FileSpecifier {
+public final class FileSpecifier {
     private final File baseSourceDir;
     private final File baseTargetDir;
     private final String sourceDir;

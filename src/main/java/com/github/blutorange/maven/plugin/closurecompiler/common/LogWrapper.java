@@ -1,5 +1,6 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
+import com.github.blutorange.maven.plugin.closurecompiler.plugin.LogLevel;
 import org.apache.maven.plugin.logging.Log;
 
 /**
@@ -7,7 +8,7 @@ import org.apache.maven.plugin.logging.Log;
  *
  * @author madgaksha
  */
-public class LogWrapper implements Log {
+public final class LogWrapper implements Log {
     private final Log wrapped;
     private final LogLevel level;
 

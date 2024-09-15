@@ -15,7 +15,15 @@ package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.absoluteFileToCanonicalFile;
 import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.getAbsoluteFile;
 
-import com.github.blutorange.maven.plugin.closurecompiler.common.*;
+import com.github.blutorange.maven.plugin.closurecompiler.common.Aggregation;
+import com.github.blutorange.maven.plugin.closurecompiler.common.AggregationConfiguration;
+import com.github.blutorange.maven.plugin.closurecompiler.common.ClosureConfig;
+import com.github.blutorange.maven.plugin.closurecompiler.common.FileProcessConfig;
+import com.github.blutorange.maven.plugin.closurecompiler.common.FileSpecifier;
+import com.github.blutorange.maven.plugin.closurecompiler.common.HtmlUpdater;
+import com.github.blutorange.maven.plugin.closurecompiler.common.LogWrapper;
+import com.github.blutorange.maven.plugin.closurecompiler.common.ProcessFilesTask;
+import com.github.blutorange.maven.plugin.closurecompiler.common.ProcessJSFilesTask;
 import com.google.gson.Gson;
 import com.google.javascript.jscomp.CompilationLevel;
 import com.google.javascript.jscomp.CompilerOptions;
@@ -743,6 +751,8 @@ public class MinifyMojo extends AbstractMojo {
     /**
      * Base directory relative to which the <code>htmlFiles</code> to process are evaluated, see the option <code>
      * htmlUpdates</code>. Relative paths are evaluated relative to the project's base directory.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "baseHtmlDir", defaultValue = "${project.basedir}/src/main/resources")
@@ -752,6 +762,8 @@ public class MinifyMojo extends AbstractMojo {
      * Base directory relative to which the <code>htmlFiles</code> to process are evaluated, see the option <code>
      * htmlUpdates</code>. Relative paths are evaluated relative to the <code>baseHtmlDir</code> option. When not given,
      * defaults to <code>baseHtmlDir</code>.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "htmlDir")
@@ -778,6 +790,11 @@ public class MinifyMojo extends AbstractMojo {
      *
      * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     *
+     * <p>Precedence: <code>htmlSourcePath</code> has the highest priority. <code>htmlUsePhysicalRoot</code> comes next,
+     * <code>htmlRoot</code> and <code>htmlScriptRoot</code> have the lowest priority.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "baseHtmlRoot", defaultValue = "${project.basedir}/src/main/resources")
@@ -805,6 +822,11 @@ public class MinifyMojo extends AbstractMojo {
      *
      * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     *
+     * <p>Precedence: <code>htmlSourcePath</code> has the highest priority. <code>htmlUsePhysicalRoot</code> comes next,
+     * <code>htmlRoot</code> and <code>htmlScriptRoot</code> have the lowest priority.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "htmlRoot")
@@ -831,6 +853,11 @@ public class MinifyMojo extends AbstractMojo {
      *
      * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     *
+     * <p>Precedence: <code>htmlSourcePath</code> has the highest priority. <code>htmlUsePhysicalRoot</code> comes next,
+     * <code>htmlRoot</code> and <code>htmlScriptRoot</code> have the lowest priority.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "baseHtmlScriptRoot", defaultValue = "${project.build.directory}/generated-resources")
@@ -858,6 +885,11 @@ public class MinifyMojo extends AbstractMojo {
      *
      * <p>Finally, the script file is relativized against the HTML file; and the final relative path used to update the
      * script tag in the HTML file is <code>../../resources/main/script.min.js</code>
+     *
+     * <p>Precedence: <code>htmlSourcePath</code> has the highest priority. <code>htmlUsePhysicalRoot</code> comes next,
+     * <code>htmlRoot</code> and <code>htmlScriptRoot</code> have the lowest priority.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "htmlScriptRoot")
@@ -867,6 +899,11 @@ public class MinifyMojo extends AbstractMojo {
      * Allows you to set the <code>sourcePath</code> option globally for each <code>htmlUpdate</code>, see the <code>
      * htmlUpdates</code> option for more details. You can still override this option for each <code>htmlUpdate</code>,
      * if you wish.
+     *
+     * <p>Precedence: <code>htmlSourcePath</code> has the highest priority. <code>htmlUsePhysicalRoot</code> comes next,
+     * <code>htmlRoot</code> and <code>htmlScriptRoot</code> have the lowest priority.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "htmlSourcePath")
@@ -876,6 +913,11 @@ public class MinifyMojo extends AbstractMojo {
      * Allows you to set the <code>usePhysicalLocation</code> option globally for each <code>htmlUpdate</code>, see the
      * <code>htmlUpdates</code> option for more details. You can still override this option for each <code>htmlUpdate
      * </code>, if you wish.
+     *
+     * <p>Precedence: <code>htmlSourcePath</code> has the highest priority. <code>htmlUsePhysicalRoot</code> comes next,
+     * <code>htmlRoot</code> and <code>htmlScriptRoot</code> have the lowest priority.
+     *
+     * @since 2.32.0
      */
     @SuppressWarnings("unused")
     @Parameter(name = "htmlUsePhysicalRoot")

@@ -1,12 +1,12 @@
-package com.github.blutorange.maven.plugin.closurecompiler.common;
+package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
-import com.github.blutorange.maven.plugin.closurecompiler.plugin.MojoMetadata;
+import com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
 import java.nio.charset.Charset;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
-public class MojoMetaImpl implements MojoMetadata {
+final class MojoMetaImpl implements MojoMetadata {
 
     private final MavenProject project;
     private final Log log;

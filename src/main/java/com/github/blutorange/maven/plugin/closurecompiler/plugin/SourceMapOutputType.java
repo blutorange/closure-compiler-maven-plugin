@@ -1,4 +1,4 @@
-package com.github.blutorange.maven.plugin.closurecompiler.common;
+package com.github.blutorange.maven.plugin.closurecompiler.plugin;
 
 public enum SourceMapOutputType {
     /** Just create a source map file named *.map. */

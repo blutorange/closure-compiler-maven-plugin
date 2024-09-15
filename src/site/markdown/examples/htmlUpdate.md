@@ -8,7 +8,7 @@ options.
 
 * For a discussion  regarding this feature, see also [issue 4](https://github.com/blutorange/closure-compiler-maven-plugin/issues/4).
 * For a longer description of each option, see the JavaDocs of
-[HtmlUpdate](https://github.com/blutorange/closure-compiler-maven-plugin/tree/master/src/main/java/com/github/blutorange/maven/plugin/closurecompiler/plugin/HtmlUpdate.java)
+[HtmlUpdate](../apidocs/com/github/blutorange/maven/plugin/closurecompiler/plugin/HtmlUpdate.html)
 * For more examples, see also the 
 [tests for this feature](https://github.com/blutorange/closure-compiler-maven-plugin/tree/master/src/test/resources/projects/htmlUpdate)
 

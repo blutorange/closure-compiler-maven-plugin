@@ -1,18 +1,16 @@
- ------
- Bundle Configuration
- ------
- Sean Scanlon
- Andre Wachsmuth
- ------
- 2018-10-08
- ------
+# Bundle Configuration
 
-Bundle Configuration
+**Deprecated** 
 
-  You can optionally specify the source files to process via an external configuration file. 
-  When a <<<bundleConfiguration>>> is defined, it overrides <<<includes>>> of the {{{../examples/basic.html}Basic Configuration}}.
+You can simply use multiple `<execution>` in the plugin configuration. If you have a use-case for bundles, consider
+[opening an issue and discuss it](../issue-management.html).
 
-+---+
+---
+
+You can optionally specify the source files to process via an external configuration file. When a `bundleConfiguration` 
+is defined, it overrides `includes` of the [Basic Configuration](../examples/basic.html).
+
+```xml
 <project>
   <!-- ... -->
   <build>
@@ -39,13 +37,13 @@ Bundle Configuration
   </build>
   <!-- ... -->
 </project>
-+---+
+```
 
-Configuration Format
+# Configuration Format
 
-  Bundles are defined in JSON format.
+Bundles are defined in JSON format.
 
-+---+
+```json
 {
     "bundles": [
         {
@@ -58,4 +56,4 @@ Configuration Format
         }
     ]
 }
-+---+
+```

@@ -209,13 +209,13 @@ public class MinifyMojoTest {
         System.setProperty("maven.multiModuleProjectDirectory", pom.getParent());
         LOG.info("Invoking maven: " + StringUtils.join(args, " "));
         try (final var out = new ByteArrayOutputStream();
-                final var err = new ByteArrayOutputStream()) {
-            try (final var outStream = new ChainedPrintStream(new PrintStream(out), System.out);
-                    final var errStream = new ChainedPrintStream(new PrintStream(err), System.err)) {
-                final var cli = new MavenCli();
-                cli.doMain(args.toArray(new String[0]), pom.getParent(), outStream, errStream);
-                return new MavenResult(out.toString(UTF_8), err.toString(UTF_8));
-            }
+             final var err = new ByteArrayOutputStream()) {
+
+            // We don't want to close ChainedPrintStream as it would close System.out, so we don't use try-with-resources
+            final var outStream = new ChainedPrintStream(new PrintStream(out), System.out);
+            final var errStream = new ChainedPrintStream(new PrintStream(err), System.err);
+            new MavenCli().doMain(args.toArray(new String[0]), pom.getParent(), outStream, errStream);
+            return new MavenResult(out.toString(UTF_8), err.toString(UTF_8));
         }
     }
 

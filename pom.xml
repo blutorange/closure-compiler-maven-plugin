@@ -543,10 +543,10 @@
                 </dependencyConvergence>
                 <requireUpperBoundDeps/>
                 <requireMavenVersion>
-                  <version>[3.9,)</version>
+                  <version>[3.8,)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>[11,18)</version>
+                  <version>[11,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>

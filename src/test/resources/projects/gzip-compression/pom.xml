@@ -3,7 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.blutorange</groupId>
     <artifactId>closure-compiler-maven-plugin-test-minimal</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -24,6 +23,60 @@
                     <baseTargetDir>${project.build.directory}</baseTargetDir>
                     <gzip>true</gzip>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-minify</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                        <configuration>
+                            <skipMerge>false</skipMerge>
+                            <skipMinify>false</skipMinify>
+                            <targetDir>test/merge_minify</targetDir>
+                            <outputFilename>out.js</outputFilename>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>merge-no-minify</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                        <configuration>
+                            <skipMerge>false</skipMerge>
+                            <skipMinify>true</skipMinify>
+                            <targetDir>test/merge_nominify</targetDir>
+                            <outputFilename>out.js</outputFilename>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>no-merge-minify</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                        <configuration>
+                            <skipMerge>true</skipMerge>
+                            <skipMinify>false</skipMinify>
+                            <targetDir>test/nomerge_minify</targetDir>
+                            <outputFilename>#{basename}.#{extension}</outputFilename>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>no-merge-no-minify</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>minify</goal>
+                        </goals>
+                        <configuration>
+                            <skipMerge>true</skipMerge>
+                            <skipMinify>true</skipMinify>
+                            <targetDir>test/nomerge_nominify</targetDir>
+                            <outputFilename>#{basename}.#{extension}</outputFilename>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

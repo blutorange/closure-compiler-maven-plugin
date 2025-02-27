@@ -968,7 +968,8 @@ public class MinifyMojo extends AbstractMojo {
     private String outputFilename;
 
     /**
-     * GZIP output file. Does not delete the original output file.
+     * When enabled, compress each output file with GZIP and create a *.gz file next to each output file. This only
+     * outputs an additional file, the original output file remains unchanged.
      *
      * @since 2.32.0
      */

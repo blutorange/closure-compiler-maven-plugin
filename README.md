@@ -151,42 +151,42 @@ For the example above, this means that the source file name would be `js/index.j
 # Build site
 
 * Edit files in `/src/site`
-* `mvn clean site`
+* `./mvnw clean site`
     * You can check out the locally rendered site in `target/site/index.html`.
 * To upload to github, add the profile `site`
-    * `mvn clean report:report site -P site`
+    * `./mvnw clean report:report site -P site`
 
 # Release
 
-* `mvn versions:display-dependency-updates`
+* `./mvnw versions:display-dependency-updates`
 * Update version in `pom.xml` and `src/test/resources/projects/parent/pom.xml`.
 * Update CHANGELOG.md
 * Generate site, check links
 * Upload site to github (see above)
 * Upload source to github
-* `mvn clean install`
-* `mvn -P release deploy`
+* `./mvnw clean install`
+* `./mvnw -P release deploy`
 
 # Test
 
 The test projects need a built version of the plugin, so make a full local build first:
 
 ```sh
-mvn clean install -DskipTests
+./mvnw clean install -DskipTests
 ```
 
 You may need to run an install on a test project first to download the required dependencies:
 
 ```sh
 cd src/test/resources/projects/minimal/
-mvn install
+./mvnw install
 cd ../../../../../
 ```
 
 Now test away
 
 ```sh
-mvn clean package test
+./mvnw clean package test
 ```
 
 To run only a single test for debugging, use 
@@ -194,7 +194,7 @@ To run only a single test for debugging, use
 ```sh
 # nameOfTestMethod is one of the methods annotated with @Test in MinifyMojoTest
 # For example: testOutputFilename
-mvn test -Dtest=MinifyMojoTest#nameOfTestMethod
+./mvnw test -Dtest=MinifyMojoTest#nameOfTestMethod
 ```
 
 To add a new test, go to `src/test/resources/projects/`, copy one of the test projects as a base (except `parent`). Open the pom.xml

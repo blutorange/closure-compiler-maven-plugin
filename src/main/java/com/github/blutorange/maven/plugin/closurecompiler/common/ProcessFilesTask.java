@@ -218,14 +218,10 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
     }
 
     private void gzipCompress(File input) throws IOException {
-        var output = new File(input.getAbsolutePath() + ".gz");
-        try (var gos = new GZIPOutputStream(new FileOutputStream(output));
-                var fis = new FileInputStream(input)) {
-
-            var buffer = new byte[8192];
-            int len;
-            while ((len = fis.read(buffer)) > 0) {
-                gos.write(buffer, 0, len);
+        final var output = new File(input.getAbsolutePath() + ".gz");
+        try (final var gos = new GZIPOutputStream(new FileOutputStream(output))) {
+            try (final var fis = new FileInputStream(input)) {
+                fis.transferTo(gos);
             }
         }
     }

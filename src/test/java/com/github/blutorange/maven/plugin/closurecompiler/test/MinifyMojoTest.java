@@ -1,15 +1,13 @@
 package com.github.blutorange.maven.plugin.closurecompiler.test;
 
-import io.takari.maven.testing.TestResources5;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.cli.MavenCli;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.relativizePath;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Function.identity;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.takari.maven.testing.TestResources5;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,13 +23,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
-
-import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.relativizePath;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.function.Function.identity;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.cli.MavenCli;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MinifyMojoTest {
 
@@ -89,7 +88,9 @@ public class MinifyMojoTest {
     private void assertDirContent(File basedir) throws IOException {
         var actual = new File(new File(basedir, "target"), "test");
         var expected = new File(basedir, "expected");
-        assertThat(expected.exists()).as("Expected directory %s must exist", expected).isTrue();
+        assertThat(expected.exists())
+                .as("Expected directory %s must exist", expected)
+                .isTrue();
 
         var expectedFiles = listFiles(expected);
         assertThat(expectedFiles)
@@ -99,7 +100,9 @@ public class MinifyMojoTest {
         if (expectedFiles.size() == 1
                 && "nofiles".equals(expectedFiles.values().iterator().next().getName())) {
             if (actual.exists()) {
-                assertThat(listFiles(actual)).as("Expecting no output files in %s", actual).isEmpty();
+                assertThat(listFiles(actual))
+                        .as("Expecting no output files in %s", actual)
+                        .isEmpty();
             }
             return;
         }
@@ -112,8 +115,9 @@ public class MinifyMojoTest {
         var encodingProvider = new EncodingProvider(basedir);
         expectedFiles.forEach((key, expectedFile) -> {
             var actualFile = actualFiles.get(key);
-            assertThatNoException().isThrownBy(
-                    () -> compareFiles(expectedFile, actualFile, encodingProvider.determineEncoding(expectedFile)));
+            assertThatNoException()
+                    .isThrownBy(() ->
+                            compareFiles(expectedFile, actualFile, encodingProvider.determineEncoding(expectedFile)));
         });
     }
 
@@ -122,7 +126,9 @@ public class MinifyMojoTest {
         if (target.exists()) {
             FileUtils.forceDelete(target);
         }
-        assertThat(target.exists()).as("Target folder must not exist anymore: %s", target).isFalse();
+        assertThat(target.exists())
+                .as("Target folder must not exist anymore: %s", target)
+                .isFalse();
     }
 
     private void compareFiles(File expectedFile, File actualFile, Charset charset) throws IOException {
@@ -146,8 +152,8 @@ public class MinifyMojoTest {
 
         // Check file contents
         assertThat(expectedLines).as("Content of %s", expectedFile).isNotEmpty();
-        assertThat(actualLines).as("Content of %s has same number of non-empty lines as %s",
-                        actualFile, expectedFile)
+        assertThat(actualLines)
+                .as("Content of %s has same number of non-empty lines as %s", actualFile, expectedFile)
                 .hasSameSizeAs(expectedLines);
 
         var lines = expectedLines.size();
@@ -160,7 +166,7 @@ public class MinifyMojoTest {
 
     private List<String> readLinesFromGzipFile(File file, Charset charset) throws IOException {
         try (var fileInputStream = new FileInputStream(file);
-            var gzipInputStream = new GZIPInputStream(fileInputStream)) {
+                var gzipInputStream = new GZIPInputStream(fileInputStream)) {
 
             return IOUtils.readLines(gzipInputStream, charset);
         }
@@ -175,9 +181,10 @@ public class MinifyMojoTest {
         System.setProperty("maven.multiModuleProjectDirectory", pom.getParent());
         LOG.info("Invoking maven: " + StringUtils.join(args, " "));
         try (final var out = new ByteArrayOutputStream();
-             final var err = new ByteArrayOutputStream()) {
+                final var err = new ByteArrayOutputStream()) {
 
-            // We don't want to close ChainedPrintStream as it would close System.out, so we don't use try-with-resources
+            // We don't want to close ChainedPrintStream as it would close System.out, so we don't use
+            // try-with-resources
             final var outStream = new ChainedPrintStream(new PrintStream(out), System.out);
             final var errStream = new ChainedPrintStream(new PrintStream(err), System.err);
             new MavenCli().doMain(args.toArray(new String[0]), pom.getParent(), outStream, errStream);
@@ -344,9 +351,9 @@ public class MinifyMojoTest {
         runMinifyAndAssertDirContent("skipif", profiles("createOlderFile", "skipIfExists"));
 
         // Now force is enabled, minification should run
-        assertThatThrownBy(() -> runMinifyAndAssertDirContent("skipif",
-                profiles("createOlderFile", "skipIfExists", "force")
-        )).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() ->
+                        runMinifyAndAssertDirContent("skipif", profiles("createOlderFile", "skipIfExists", "force")))
+                .isInstanceOf(AssertionError.class);
     }
 
     @Test
@@ -359,9 +366,9 @@ public class MinifyMojoTest {
         runMinifyAndAssertDirContent("skipif", profiles("createNewerFile", "skipIfNewer"));
 
         // Now force is enabled, minification should run
-        assertThatThrownBy(() -> runMinifyAndAssertDirContent("skipif",
-                profiles("createNewerFile", "skipIfNewer", "force")
-        )).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() ->
+                        runMinifyAndAssertDirContent("skipif", profiles("createNewerFile", "skipIfNewer", "force")))
+                .isInstanceOf(AssertionError.class);
     }
 
     @Test

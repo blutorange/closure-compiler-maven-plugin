@@ -17,12 +17,6 @@ import static java.io.OutputStream.nullOutputStream;
 
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.SkipMode;
 import com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.CountingOutputStream;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.maven.plugin.MojoFailureException;
-import org.sonatype.plexus.build.incremental.BuildContext;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +38,11 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.CountingOutputStream;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.maven.plugin.MojoFailureException;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /** Abstract class for merging and compressing a files list. */
 public abstract class ProcessFilesTask implements Callable<List<ProcessingResult>> {
@@ -221,7 +220,7 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
     private void gzipCompress(File input) throws IOException {
         var output = new File(input.getAbsolutePath() + ".gz");
         try (var gos = new GZIPOutputStream(new FileOutputStream(output));
-             var fis = new FileInputStream(input)) {
+                var fis = new FileInputStream(input)) {
 
             var buffer = new byte[8192];
             int len;
@@ -241,7 +240,7 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
 
         final ProcessingResult result;
         if (minify) {
-            result =  minify(inputFiles, outputFile);
+            result = minify(inputFiles, outputFile);
         } else if (inputFiles.size() == 1) {
             result = copy(inputFiles.get(0), outputFile);
         } else {
@@ -381,8 +380,7 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
      * Merges a list of source files. Create missing parent directories if needed.
      *
      * @param sourceFiles list of input files to merge
-     * @param mergedFile  output file resulting from the merged step
-     *
+     * @param mergedFile output file resulting from the merged step
      * @throws IOException when the merge step fails
      */
     protected final ProcessingResult merge(List<File> sourceFiles, File mergedFile) throws IOException {

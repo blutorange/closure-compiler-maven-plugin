@@ -25,7 +25,8 @@ public class FileHelper {
 
     /** @return The path of the given {@code target}, relative to the specified {@code base} file. */
     public static String relativizePath(File base, File target) {
-        final var targetPath = absoluteFileToCanonicalFile(target.getAbsoluteFile()).toPath();
+        final var targetPath =
+                absoluteFileToCanonicalFile(target.getAbsoluteFile()).toPath();
         if (base == null) {
             return targetPath.toString();
         }

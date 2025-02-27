@@ -5,8 +5,10 @@ See also the [closure compiler changelog](https://github.com/google/closure-comp
 ## 2.32.0 (unreleased)
 
 * feat: Add new option `htmlUpdates` for updating HTML files with the generated files, #4
+* feat: Add new option `gzip` to create gzip files next to each ouptut file, #5
 * chore: Add spotless code formatter.
 * chore: Minor code cleanup.
+* chore: Update dependencies.
 
 ## 2.31.0
 

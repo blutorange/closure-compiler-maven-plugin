@@ -388,4 +388,9 @@ public class MinifyMojoTest {
     public void testUseTypesForOptimization() throws Exception {
         runMinifyAndAssertDirContent("usetypesforoptimization");
     }
+
+    @Test
+    public void testGzipCompression() throws Exception {
+        runMinifyAndAssertDirContent("gzip-compression");
+    }
 }

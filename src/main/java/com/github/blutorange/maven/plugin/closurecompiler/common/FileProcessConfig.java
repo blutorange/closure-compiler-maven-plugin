@@ -9,6 +9,7 @@ public final class FileProcessConfig {
     private final int bufferSize;
     private final String lineSeparator;
     private final SkipMode skipMode;
+    private final boolean gzip;
     private final boolean allowReplacingInputFiles;
 
     public FileProcessConfig(
@@ -18,6 +19,7 @@ public final class FileProcessConfig {
             boolean skipMerge,
             boolean skipMinify,
             SkipMode skipMode,
+            boolean gzip,
             boolean allowReplacingInputFiles) {
         this.lineSeparator = lineSeparator;
         this.bufferSize = bufferSize;
@@ -25,6 +27,7 @@ public final class FileProcessConfig {
         this.skipMerge = skipMerge;
         this.skipMinify = skipMinify;
         this.skipMode = skipMode;
+        this.gzip = gzip;
         this.allowReplacingInputFiles = allowReplacingInputFiles;
     }
 
@@ -46,6 +49,10 @@ public final class FileProcessConfig {
 
     public SkipMode getSkipMode() {
         return skipMode;
+    }
+
+    public boolean isGzip() {
+        return gzip;
     }
 
     public int getBufferSize() {

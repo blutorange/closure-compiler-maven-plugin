@@ -967,6 +967,14 @@ public class MinifyMojo extends AbstractMojo {
     @Parameter(property = "outputFilename", defaultValue = "#{path}/#{basename}.min.#{extension}")
     private String outputFilename;
 
+    /**
+     * GZIP output file. Does not delete the original output file.
+     *
+     * @since 2.32.0
+     */
+    @Parameter(property = "gzip", defaultValue = "false")
+    private boolean gzip;
+
     @SuppressWarnings("unused")
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -1064,7 +1072,7 @@ public class MinifyMojo extends AbstractMojo {
             ClosureConfig closureConfig, List<String> includes, List<String> excludes, String outputFilename)
             throws IOException {
         final var processConfig = new FileProcessConfig(
-                lineSeparator, bufferSize, force, skipMerge, skipMinify, skipMode, allowReplacingInputFiles);
+                lineSeparator, bufferSize, force, skipMerge, skipMinify, skipMode, gzip, allowReplacingInputFiles);
         final var fileSpecifier = new FileSpecifier(
                 baseSourceDir, baseTargetDir, sourceDir, targetDir, includes, excludes, outputFilename);
         final var mojoMeta = new MojoMetaImpl(project, getLog(), encoding, buildContext);

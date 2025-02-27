@@ -63,18 +63,17 @@ public class MinifyMojoTest {
     }
 
     private static class MavenResult {
-        final String errString;
         final String outString;
 
-        public MavenResult(String outString, String errString) {
+        public MavenResult(String outString) {
             this.outString = outString;
-            this.errString = errString;
         }
 
-        public String getErrString() {
-            return errString;
-        }
-
+        /**
+         * The combined output from stdout and stderr.
+         *
+         * @return The combined output from stdout and stderr.
+         */
         public String getOutString() {
             return outString;
         }
@@ -179,16 +178,13 @@ public class MinifyMojoTest {
         args.add("-DskipTests");
         profiles.stream().flatMap(profile -> Stream.of("-P", profile)).forEach(args::add);
         System.setProperty("maven.multiModuleProjectDirectory", pom.getParent());
-        LOG.info("Invoking maven: " + StringUtils.join(args, " "));
-        try (final var out = new ByteArrayOutputStream();
-                final var err = new ByteArrayOutputStream()) {
-
+        LOG.info("Invoking maven: {}", StringUtils.join(args, " "));
+        try (final var out = new ByteArrayOutputStream()) {
             // We don't want to close ChainedPrintStream as it would close System.out, so we don't use
             // try-with-resources
             final var outStream = new ChainedPrintStream(new PrintStream(out), System.out);
-            final var errStream = new ChainedPrintStream(new PrintStream(err), System.err);
-            new MavenCli().doMain(args.toArray(new String[0]), pom.getParent(), outStream, errStream);
-            return new MavenResult(out.toString(UTF_8), err.toString(UTF_8));
+            new MavenCli().doMain(args.toArray(new String[0]), pom.getParent(), outStream, outStream);
+            return new MavenResult(out.toString(UTF_8));
         }
     }
 
@@ -304,7 +300,7 @@ public class MinifyMojoTest {
 
     @Test
     public void testOverwriteInputFilesDisabled() throws Exception {
-        assertThat(runMinify("overwriteInputFilesDisabled", profiles()).getErrString())
+        assertThat(runMinify("overwriteInputFilesDisabled", profiles()).getOutString())
                 .contains("The source file [fileC.js] has the same name as the output file [fileC.js]");
     }
 

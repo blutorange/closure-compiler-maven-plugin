@@ -203,10 +203,10 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
                     new File(targetDir, DEFAULT_MERGED_FILENAME), targetDir, targetDir);
             results = List.of(processFiles(sourceFiles, outputFile, minify, gzip));
         } else {
-            var list = new ArrayList<ProcessingResult>();
-            for (File file : sourceFiles) {
-                var outputFile = outputFilenameInterpolator.interpolate(file, sourceDir, targetDir);
-                var result = processFiles(List.of(file), outputFile, minify, gzip);
+            final var list = new ArrayList<ProcessingResult>();
+            for (final var file : sourceFiles) {
+                final var outputFile = outputFilenameInterpolator.interpolate(file, sourceDir, targetDir);
+                final var result = processFiles(List.of(file), outputFile, minify, gzip);
                 list.add(result);
             }
             results = list;
@@ -233,7 +233,7 @@ public abstract class ProcessFilesTask implements Callable<List<ProcessingResult
     private ProcessingResult processFiles(List<File> inputFiles, File outputFile, boolean minify, boolean gzip)
             throws MojoFailureException, IOException {
         if (minify || inputFiles.size() == 1) {
-            for (File inputFile : inputFiles) {
+            for (final var inputFile : inputFiles) {
                 assertTarget(inputFile, outputFile);
             }
         }

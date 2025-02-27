@@ -175,7 +175,7 @@ The test projects need a built version of the plugin, so make a full local build
 ./mvnw clean install -DskipTests
 ```
 
-You may need to run an install on a test project first to download the required dependencies:
+You may need to run `install` on a test project first to download the required dependencies:
 
 ```sh
 cd src/test/resources/projects/minimal/

@@ -25,15 +25,13 @@ public class FileHelper {
 
     /** @return The path of the given {@code target}, relative to the specified {@code base} file. */
     public static String relativizePath(File base, File target) {
-        final var targetPath =
-                absoluteFileToCanonicalFile(target.getAbsoluteFile()).toPath();
+        final var targetPath = absoluteFileToCanonicalFile(target.getAbsoluteFile()).toPath();
         if (base == null) {
             return targetPath.toString();
-        } else {
-            final var basePath =
-                    absoluteFileToCanonicalFile(base.getAbsoluteFile()).toPath();
-            return basePath.relativize(targetPath).toString();
         }
+
+        final var basePath = absoluteFileToCanonicalFile(base.getAbsoluteFile()).toPath();
+        return basePath.relativize(targetPath).toString().replace(File.separatorChar, '/');
     }
 
     /**
@@ -45,10 +43,10 @@ public class FileHelper {
         final var targetPath = target.toPath();
         if (base == null) {
             return targetPath.toString();
-        } else {
-            final var basePath = base.toPath();
-            return basePath.relativize(targetPath).toString();
         }
+
+        final var basePath = base.toPath();
+        return basePath.relativize(targetPath).toString().replace(File.separatorChar, '/');
     }
 
     /** Sames as {@link FileUtils#getFile(File, String...)}, but ignores empty names. */

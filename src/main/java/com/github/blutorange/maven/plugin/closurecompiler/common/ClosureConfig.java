@@ -126,6 +126,7 @@ public final class ClosureConfig {
         }
         if (mojo.getClosureInlineProperties() != null) {
             options.setInlineProperties(mojo.getClosureInlineProperties());
+            options.setCheckTypes(true);
         }
         if (mojo.getClosureInlineVariables() != null) {
             options.setInlineVariables(mojo.getClosureInlineVariables());

@@ -2,13 +2,15 @@
 var $jscomp = $jscomp || {};
 $jscomp.scope = {};
 $jscomp.ASSUME_ES5 = !1;
+$jscomp.ASSUME_ES6 = !1;
+$jscomp.ASSUME_ES2020 = !1;
 $jscomp.ASSUME_NO_NATIVE_MAP = !1;
 $jscomp.ASSUME_NO_NATIVE_SET = !1;
-$jscomp.SIMPLE_FROUND_POLYFILL = !1;
 $jscomp.ISOLATE_POLYFILLS = !1;
 $jscomp.FORCE_POLYFILL_PROMISE = !1;
 $jscomp.FORCE_POLYFILL_PROMISE_WHEN_NO_UNHANDLED_REJECTION = !1;
-$jscomp.defineProperty = $jscomp.ASSUME_ES5 || "function" == typeof Object.defineProperties ? Object.defineProperty : function(a, b, c) {
+$jscomp.INSTRUMENT_ASYNC_CONTEXT = !0;
+$jscomp.defineProperty = $jscomp.ASSUME_ES5 || typeof Object.defineProperties == "function" ? Object.defineProperty : function(a, b, c) {
   if (a == Array.prototype || a == Object.prototype) {
     return a;
   }
@@ -25,20 +27,20 @@ $jscomp.getGlobal = function(a) {
   }
   throw Error("Cannot find global object");
 };
-$jscomp.global = $jscomp.getGlobal(this);
-$jscomp.IS_SYMBOL_NATIVE = "function" === typeof Symbol && "symbol" === typeof Symbol("x");
+$jscomp.global = $jscomp.ASSUME_ES2020 ? globalThis : $jscomp.getGlobal(this);
+$jscomp.IS_SYMBOL_NATIVE = typeof Symbol === "function" && typeof Symbol("x") === "symbol";
 $jscomp.TRUST_ES6_POLYFILLS = !$jscomp.ISOLATE_POLYFILLS || $jscomp.IS_SYMBOL_NATIVE;
 $jscomp.polyfills = {};
 $jscomp.propertyToPolyfillSymbol = {};
 $jscomp.POLYFILL_PREFIX = "$jscp$";
 var $jscomp$lookupPolyfilledValue = function(a, b, c) {
-  if (!c || null != a) {
+  if (!c || a != null) {
     c = $jscomp.propertyToPolyfillSymbol[b];
-    if (null == c) {
+    if (c == null) {
       return a[b];
     }
     c = a[c];
-    return void 0 !== c ? c : a[b];
+    return c !== void 0 ? c : a[b];
   }
 };
 $jscomp.polyfill = function(a, b, c, d) {
@@ -57,11 +59,11 @@ $jscomp.polyfillUnisolated = function(a, b, c, d) {
   a = a[a.length - 1];
   d = c[a];
   b = b(d);
-  b != d && null != b && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
+  b != d && b != null && $jscomp.defineProperty(c, a, {configurable:!0, writable:!0, value:b});
 };
 $jscomp.polyfillIsolated = function(a, b, c, d) {
   var e = a.split(".");
-  a = 1 === e.length;
+  a = e.length === 1;
   d = e[0];
   d = !a && d in $jscomp.polyfills ? $jscomp.polyfills : $jscomp.global;
   for (var f = 0; f < e.length - 1; f++) {
@@ -72,9 +74,9 @@ $jscomp.polyfillIsolated = function(a, b, c, d) {
     d = d[g];
   }
   e = e[e.length - 1];
-  c = $jscomp.IS_SYMBOL_NATIVE && "es6" === c ? d[e] : null;
+  c = $jscomp.IS_SYMBOL_NATIVE && c === "es6" ? d[e] : null;
   b = b(c);
-  null != b && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {configurable:!0, writable:!0, value:b}) : b !== c && (void 0 === $jscomp.propertyToPolyfillSymbol[e] && (c = 1E9 * Math.random() >>> 0, $jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + c + "$" + e), $jscomp.defineProperty(d, $jscomp.propertyToPolyfillSymbol[e], {configurable:!0, writable:!0, value:b})));
+  b != null && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {configurable:!0, writable:!0, value:b}) : b !== c && ($jscomp.propertyToPolyfillSymbol[e] === void 0 && (c = Math.random() * 1E9 >>> 0, $jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + c + "$" + e), $jscomp.defineProperty(d, $jscomp.propertyToPolyfillSymbol[e], {configurable:!0, writable:!0, value:b})));
 };
 $jscomp.underscoreProtoCanBeSet = function() {
   var a = {a:!0}, b = {};
@@ -84,7 +86,7 @@ $jscomp.underscoreProtoCanBeSet = function() {
   }
   return !1;
 };
-$jscomp.setPrototypeOf = $jscomp.TRUST_ES6_POLYFILLS && "function" == typeof Object.setPrototypeOf ? Object.setPrototypeOf : $jscomp.underscoreProtoCanBeSet() ? function(a, b) {
+$jscomp.setPrototypeOf = $jscomp.ASSUME_ES6 || $jscomp.TRUST_ES6_POLYFILLS && typeof Object.setPrototypeOf == "function" ? Object.setPrototypeOf : $jscomp.underscoreProtoCanBeSet() ? function(a, b) {
   a.__proto__ = b;
   if (a.__proto__ !== b) {
     throw new TypeError(a + " is not extensible");
@@ -101,11 +103,11 @@ $jscomp.arrayIterator = function(a) {
   return {next:$jscomp.arrayIteratorImpl(a)};
 };
 $jscomp.makeIterator = function(a) {
-  var b = "undefined" != typeof Symbol && Symbol.iterator && a[Symbol.iterator];
+  var b = typeof Symbol != "undefined" && Symbol.iterator && a[Symbol.iterator];
   if (b) {
     return b.call(a);
   }
-  if ("number" == typeof a.length) {
+  if (typeof a.length == "number") {
     return $jscomp.arrayIterator(a);
   }
   throw Error(String(a) + " is not an iterable or ArrayLike");
@@ -173,7 +175,7 @@ $jscomp.generator.Context.prototype.jumpToEnd = function() {
 };
 $jscomp.generator.Context.prototype.setCatchFinallyBlocks = function(a, b) {
   this.catchAddress_ = a;
-  void 0 != b && (this.finallyAddress_ = b);
+  b != void 0 && (this.finallyAddress_ = b);
 };
 $jscomp.generator.Context.prototype.setFinallyBlock = function(a) {
   this.catchAddress_ = 0;
@@ -200,7 +202,7 @@ $jscomp.generator.Context.prototype.leaveFinallyBlock = function(a, b) {
     if (b.isException) {
       return this.jumpToErrorHandler_();
     }
-    void 0 != b.jumpTo && this.finallyAddress_ < b.jumpTo ? (this.nextAddress = b.jumpTo, this.abruptCompletion_ = null) : this.nextAddress = this.finallyAddress_;
+    b.jumpTo != void 0 && this.finallyAddress_ < b.jumpTo ? (this.nextAddress = b.jumpTo, this.abruptCompletion_ = null) : this.nextAddress = this.finallyAddress_;
   } else {
     this.nextAddress = a;
   }
@@ -217,7 +219,7 @@ $jscomp.generator.Context.PropertyIterator = function(a) {
   this.properties_.reverse();
 };
 $jscomp.generator.Context.PropertyIterator.prototype.getNext = function() {
-  for (; 0 < this.properties_.length;) {
+  for (; this.properties_.length > 0;) {
     var a = this.properties_.pop();
     if (a in this.object_) {
       return a;
@@ -333,7 +335,7 @@ $jscomp.asyncExecutePromiseGeneratorProgram = function(a) {
   return $jscomp.asyncExecutePromiseGenerator(new $jscomp.generator.Generator_(new $jscomp.generator.Engine_(a)));
 };
 function onMoreClicked$$module$dynamic_import_false(a) {
-  return $jscomp.asyncExecutePromiseGeneratorFunction(function*() {
+  return (0,$jscomp.asyncExecutePromiseGeneratorFunction)(function*() {
     enableAwesomeFeature$$module$import();
   });
 }

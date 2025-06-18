@@ -1,7 +1,6 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.substring;
 
 import java.io.File;
@@ -26,7 +25,7 @@ final class TextFileModifications {
     public static String apply(String textContent, List<TextFileModification> modifications) {
         final var sortedModifications = modifications.stream()
                 .sorted(comparing(TextFileModification::getStartPosition).reversed())
-                .collect(toList());
+                .toList();
         for (final var modification : sortedModifications) {
             textContent = applyModification(textContent, modification);
         }

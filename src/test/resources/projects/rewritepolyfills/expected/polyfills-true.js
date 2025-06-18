@@ -11,13 +11,15 @@ $jscomp.arrayIterator = function(a) {
   return {next:$jscomp.arrayIteratorImpl(a)};
 };
 $jscomp.ASSUME_ES5 = !1;
+$jscomp.ASSUME_ES6 = !1;
+$jscomp.ASSUME_ES2020 = !1;
 $jscomp.ASSUME_NO_NATIVE_MAP = !1;
 $jscomp.ASSUME_NO_NATIVE_SET = !1;
-$jscomp.SIMPLE_FROUND_POLYFILL = !1;
 $jscomp.ISOLATE_POLYFILLS = !1;
 $jscomp.FORCE_POLYFILL_PROMISE = !1;
 $jscomp.FORCE_POLYFILL_PROMISE_WHEN_NO_UNHANDLED_REJECTION = !1;
-$jscomp.defineProperty = $jscomp.ASSUME_ES5 || "function" == typeof Object.defineProperties ? Object.defineProperty : function(a, c, b) {
+$jscomp.INSTRUMENT_ASYNC_CONTEXT = !0;
+$jscomp.defineProperty = $jscomp.ASSUME_ES5 || typeof Object.defineProperties == "function" ? Object.defineProperty : function(a, c, b) {
   if (a == Array.prototype || a == Object.prototype) {
     return a;
   }
@@ -34,20 +36,20 @@ $jscomp.getGlobal = function(a) {
   }
   throw Error("Cannot find global object");
 };
-$jscomp.global = $jscomp.getGlobal(this);
-$jscomp.IS_SYMBOL_NATIVE = "function" === typeof Symbol && "symbol" === typeof Symbol("x");
+$jscomp.global = $jscomp.ASSUME_ES2020 ? globalThis : $jscomp.getGlobal(this);
+$jscomp.IS_SYMBOL_NATIVE = typeof Symbol === "function" && typeof Symbol("x") === "symbol";
 $jscomp.TRUST_ES6_POLYFILLS = !$jscomp.ISOLATE_POLYFILLS || $jscomp.IS_SYMBOL_NATIVE;
 $jscomp.polyfills = {};
 $jscomp.propertyToPolyfillSymbol = {};
 $jscomp.POLYFILL_PREFIX = "$jscp$";
 var $jscomp$lookupPolyfilledValue = function(a, c, b) {
-  if (!b || null != a) {
+  if (!b || a != null) {
     b = $jscomp.propertyToPolyfillSymbol[c];
-    if (null == b) {
+    if (b == null) {
       return a[c];
     }
     b = a[b];
-    return void 0 !== b ? b : a[c];
+    return b !== void 0 ? b : a[c];
   }
 };
 $jscomp.polyfill = function(a, c, b, d) {
@@ -66,11 +68,11 @@ $jscomp.polyfillUnisolated = function(a, c, b, d) {
   a = a[a.length - 1];
   d = b[a];
   c = c(d);
-  c != d && null != c && $jscomp.defineProperty(b, a, {configurable:!0, writable:!0, value:c});
+  c != d && c != null && $jscomp.defineProperty(b, a, {configurable:!0, writable:!0, value:c});
 };
 $jscomp.polyfillIsolated = function(a, c, b, d) {
   var e = a.split(".");
-  a = 1 === e.length;
+  a = e.length === 1;
   d = e[0];
   d = !a && d in $jscomp.polyfills ? $jscomp.polyfills : $jscomp.global;
   for (var f = 0; f < e.length - 1; f++) {
@@ -81,9 +83,9 @@ $jscomp.polyfillIsolated = function(a, c, b, d) {
     d = d[g];
   }
   e = e[e.length - 1];
-  b = $jscomp.IS_SYMBOL_NATIVE && "es6" === b ? d[e] : null;
+  b = $jscomp.IS_SYMBOL_NATIVE && b === "es6" ? d[e] : null;
   c = c(b);
-  null != c && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {configurable:!0, writable:!0, value:c}) : c !== b && (void 0 === $jscomp.propertyToPolyfillSymbol[e] && (b = 1E9 * Math.random() >>> 0, $jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + b + "$" + e), $jscomp.defineProperty(d, $jscomp.propertyToPolyfillSymbol[e], {configurable:!0, writable:!0, value:c})));
+  c != null && (a ? $jscomp.defineProperty($jscomp.polyfills, e, {configurable:!0, writable:!0, value:c}) : c !== b && ($jscomp.propertyToPolyfillSymbol[e] === void 0 && (b = Math.random() * 1E9 >>> 0, $jscomp.propertyToPolyfillSymbol[e] = $jscomp.IS_SYMBOL_NATIVE ? $jscomp.global.Symbol(e) : $jscomp.POLYFILL_PREFIX + b + "$" + e), $jscomp.defineProperty(d, $jscomp.propertyToPolyfillSymbol[e], {configurable:!0, writable:!0, value:c})));
 };
 $jscomp.initSymbol = function() {
 };
@@ -95,15 +97,18 @@ $jscomp.iteratorPrototype = function(a) {
   return a;
 };
 $jscomp.iteratorFromArray = function(a, c) {
+  if ($jscomp.ASSUME_ES6) {
+    return a[Symbol.iterator]();
+  }
   a instanceof String && (a += "");
   var b = 0, d = !1, e = {next:function() {
-    if (!d && b < a.length) {
-      var f = b++;
-      return {value:c(f, a[f]), done:!1};
-    }
-    d = !0;
-    return {done:!0, value:void 0};
-  }};
+      if (!d && b < a.length) {
+        var f = b++;
+        return {value:c(f, a[f]), done:!1};
+      }
+      d = !0;
+      return {done:!0, value:void 0};
+    }};
   e[Symbol.iterator] = function() {
     return e;
   };

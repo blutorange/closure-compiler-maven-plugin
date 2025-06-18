@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -192,6 +193,42 @@ public class MinifyMojo extends AbstractMojo {
     @SuppressWarnings("unused")
     @Parameter(property = "closureCompilationLevel", defaultValue = "SIMPLE_OPTIMIZATIONS")
     private CompilationLevel closureCompilationLevel;
+
+    /**
+     * Set the constant variables inlining policy for the compiler.
+     *
+     * @since 2.33.0
+     */
+    @SuppressWarnings("unused")
+    @Parameter(property = "closureInlineConstantVars")
+    private boolean closureInlineConstantVars;
+
+    /**
+     * Set the functions inlining policy for the compiler.
+     *
+     * @since 2.33.0
+     */
+    @SuppressWarnings("unused")
+    @Parameter(property = "closureInlineFunctions")
+    private CompilerOptions.Reach closureInlineFunctions;
+
+    /**
+     * Set the properties inlining policy for the compiler.
+     *
+     * @since 2.33.0
+     */
+    @SuppressWarnings("unused")
+    @Parameter(property = "closureInlineProperties")
+    private boolean closureInlineProperties;
+
+    /**
+     * Set the variable inlining policy for the compiler.
+     *
+     * @since 2.33.0
+     */
+    @SuppressWarnings("unused")
+    @Parameter(property = "closureInlineVariables")
+    private CompilerOptions.Reach closureInlineVariables;
 
     /**
      * Collects information mapping the generated (compiled) source back to its original source for debugging purposes.
@@ -1240,7 +1277,7 @@ public class MinifyMojo extends AbstractMojo {
         return closureCompilationLevel;
     }
 
-    public HashMap<String, String> getClosureDefineReplacements() {
+    public Map<String, String> getClosureDefineReplacements() {
         return closureDefineReplacements;
     }
 
@@ -1274,6 +1311,22 @@ public class MinifyMojo extends AbstractMojo {
 
     public ArrayList<String> getClosureForceInjectLibs() {
         return closureForceInjectLibs;
+    }
+
+    public boolean getClosureInlineConstantVars() {
+        return closureInlineConstantVars;
+    }
+
+    public CompilerOptions.Reach getClosureInlineFunctions() {
+        return closureInlineFunctions;
+    }
+
+    public boolean getClosureInlineProperties() {
+        return closureInlineProperties;
+    }
+
+    public CompilerOptions.Reach getClosureInlineVariables() {
+        return closureInlineVariables;
     }
 
     public ArrayList<String> getClosureJsModuleRoots() {

@@ -14,10 +14,11 @@ final class HtmlModifier {
         }
         final var firstChildSourceRange = element.childNode(0).sourceRange();
         final var lastChild = element.childNode(element.childNodeSize() - 1);
-        final var lastChildSourceRange =
-                lastChild instanceof Element ? ((Element) lastChild).endSourceRange() : lastChild.sourceRange();
+        final var lastChildSourceRange = lastChild.sourceRange();
+        final var lastChildEndSourceRange =
+                lastChild instanceof Element ? ((Element) lastChild).endSourceRange() : lastChildSourceRange;
         final var from = firstChildSourceRange.startPos();
-        final var to = lastChildSourceRange.endPos();
+        final var to = Math.max(lastChildSourceRange.endPos(), lastChildEndSourceRange.endPos());
         return to > from ? new TextFileModification(from, to, "") : null;
     }
 

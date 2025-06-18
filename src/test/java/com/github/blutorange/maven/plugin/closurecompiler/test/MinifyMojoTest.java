@@ -3,9 +3,11 @@ package com.github.blutorange.maven.plugin.closurecompiler.test;
 import static com.github.blutorange.maven.plugin.closurecompiler.common.FileHelper.relativizePath;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Function.identity;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.takari.maven.testing.TestResources5;
 import java.io.ByteArrayOutputStream;
@@ -87,36 +89,30 @@ public class MinifyMojoTest {
     private void assertDirContent(File basedir) throws IOException {
         var actual = new File(new File(basedir, "target"), "test");
         var expected = new File(basedir, "expected");
-        assertThat(expected.exists())
-                .as("Expected directory %s must exist", expected)
-                .isTrue();
-
+        assertTrue(expected.exists());
         var expectedFiles = listFiles(expected);
-        assertThat(expectedFiles)
-                .as("There must be at least one expected file. Add a file 'nofiles' if you expect there to be no files")
-                .isNotEmpty();
+        assertFalse(
+                expectedFiles.isEmpty(),
+                "There must be at least one expected file. Add a file 'nofiles' if you expect there to be no files");
 
         if (expectedFiles.size() == 1
                 && "nofiles".equals(expectedFiles.values().iterator().next().getName())) {
             if (actual.exists()) {
-                assertThat(listFiles(actual))
-                        .as("Expecting no output files in %s", actual)
-                        .isEmpty();
+                assertTrue(listFiles(actual).isEmpty(), "Expecting no output files in " + actual);
             }
             return;
         }
 
-        assertThat(actual.exists()).as("Actual directory %s must exist", actual).isTrue();
+        assertTrue(actual.exists(), "Actual directory " + actual + " must exist");
 
         var actualFiles = listFiles(actual);
-        assertThat(actualFiles).containsOnlyKeys(expectedFiles.keySet());
+        assertEquals(actualFiles.keySet(), expectedFiles.keySet());
 
         var encodingProvider = new EncodingProvider(basedir);
         expectedFiles.forEach((key, expectedFile) -> {
             var actualFile = actualFiles.get(key);
-            assertThatNoException()
-                    .isThrownBy(() ->
-                            compareFiles(expectedFile, actualFile, encodingProvider.determineEncoding(expectedFile)));
+            assertDoesNotThrow(
+                    () -> compareFiles(expectedFile, actualFile, encodingProvider.determineEncoding(expectedFile)));
         });
     }
 
@@ -125,17 +121,15 @@ public class MinifyMojoTest {
         if (target.exists()) {
             FileUtils.forceDelete(target);
         }
-        assertThat(target.exists())
-                .as("Target folder must not exist anymore: %s", target)
-                .isFalse();
+        assertFalse(target.exists());
     }
 
     private void compareFiles(File expectedFile, File actualFile, Charset charset) throws IOException {
         final List<String> expectedLines;
         final List<String> actualLines;
 
-        assertThat(expectedFile).exists();
-        assertThat(actualFile).exists();
+        assertTrue(expectedFile.exists());
+        assertTrue(actualFile.exists());
 
         if (expectedFile.getAbsolutePath().endsWith(".gz")) {
             expectedLines = readLinesFromGzipFile(expectedFile, charset);
@@ -150,16 +144,19 @@ public class MinifyMojoTest {
         actualLines.removeIf(StringUtils::isBlank);
 
         // Check file contents
-        assertThat(expectedLines).as("Content of %s", expectedFile).isNotEmpty();
-        assertThat(actualLines)
-                .as("Content of %s has same number of non-empty lines as %s", actualFile, expectedFile)
-                .hasSameSizeAs(expectedLines);
-
-        var lines = expectedLines.size();
-        for (int i = 0; i < lines; ++i) {
-            assertThat(actualLines.get(i))
-                    .as("Line from %s should be the same as line from %s", actualFile, expectedFile)
-                    .isEqualToIgnoringNewLines(expectedLines.get(i));
+        assertFalse(
+                expectedLines.isEmpty(),
+                "Expected file must contain at least one non-empty line: '" + actualFile.getAbsolutePath() + "'");
+        assertEquals(
+                expectedLines.size(),
+                actualLines.size(),
+                "Number of non-empty lines in expected file must match the generated number of lines: '"
+                        + actualFile.getAbsolutePath() + "'");
+        for (int i = 0, j = expectedLines.size(); i < j; ++i) {
+            assertEquals(
+                    expectedLines.get(i).trim(),
+                    actualLines.get(i).trim(),
+                    "Actual content of file '" + actualFile.getAbsolutePath() + "' differs from the expected content");
         }
     }
 
@@ -197,12 +194,12 @@ public class MinifyMojoTest {
         final var parentDir = testResources.getBasedir("parent").getCanonicalFile();
         final var parentPom = new File(parentDir, "pom.xml");
         final var parentPomNew = new File(parentDir.getParentFile(), "pom.xml");
-        assertThat(parentPom).exists();
+        assertTrue(parentPom.exists());
         FileUtils.copyFile(parentPom, parentPomNew);
 
         final var basedir = testResources.getBasedir(projectName).getCanonicalFile();
         final var pom = new File(basedir, "pom.xml");
-        assertThat(pom).exists();
+        assertTrue(pom.exists());
 
         clean(basedir);
         invokeMaven(parentPomNew, "install", List.of());
@@ -261,8 +258,7 @@ public class MinifyMojoTest {
     @Test
     public void testExterns() throws Exception {
         // No externs declared, variable cannot be found, so minification should fail
-        assertThatThrownBy(() -> runMinifyAndAssertDirContent("externs", profiles("without-externs")))
-                .isInstanceOf(AssertionError.class);
+        assertThrows(AssertionError.class, () -> runMinifyAndAssertDirContent("externs", profiles("without-externs")));
 
         // Externs declared, variable can be found, so minification should succeed
         runMinifyAndAssertDirContent("externs", profiles("createOlderFile", "with-externs"));
@@ -300,8 +296,8 @@ public class MinifyMojoTest {
 
     @Test
     public void testOverwriteInputFilesDisabled() throws Exception {
-        assertThat(runMinify("overwriteInputFilesDisabled", profiles()).getOutString())
-                .contains("The source file [fileC.js] has the same name as the output file [fileC.js]");
+        var result = runMinify("overwriteInputFilesDisabled", profiles()).getOutString();
+        assertTrue(result.contains("The source file [fileC.js] has the same name as the output file [fileC.js]"));
     }
 
     @Test
@@ -347,24 +343,23 @@ public class MinifyMojoTest {
         runMinifyAndAssertDirContent("skipif", profiles("createOlderFile", "skipIfExists"));
 
         // Now force is enabled, minification should run
-        assertThatThrownBy(() ->
-                        runMinifyAndAssertDirContent("skipif", profiles("createOlderFile", "skipIfExists", "force")))
-                .isInstanceOf(AssertionError.class);
+        assertThrows(
+                AssertionError.class,
+                () -> runMinifyAndAssertDirContent("skipif", profiles("createOlderFile", "skipIfExists", "force")));
     }
 
     @Test
     public void testSkipIfNewer() throws Exception {
         // Output file does not exist, minification should run
-        assertThatThrownBy(() -> runMinifyAndAssertDirContent("skipif", profiles("skipIfNewer")))
-                .isInstanceOf(AssertionError.class);
+        assertThrows(AssertionError.class, () -> runMinifyAndAssertDirContent("skipif", profiles("skipIfNewer")));
 
         // This creates the newer output file, so the minification process should not run
         runMinifyAndAssertDirContent("skipif", profiles("createNewerFile", "skipIfNewer"));
 
         // Now force is enabled, minification should run
-        assertThatThrownBy(() ->
-                        runMinifyAndAssertDirContent("skipif", profiles("createNewerFile", "skipIfNewer", "force")))
-                .isInstanceOf(AssertionError.class);
+        assertThrows(
+                AssertionError.class,
+                () -> runMinifyAndAssertDirContent("skipif", profiles("createNewerFile", "skipIfNewer", "force")));
     }
 
     @Test

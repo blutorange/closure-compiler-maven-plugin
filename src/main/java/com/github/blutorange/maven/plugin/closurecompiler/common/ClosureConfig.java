@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.maven.plugin.MojoFailureException;
@@ -85,6 +84,20 @@ public final class ClosureConfig {
         if (!mojo.getClosureForceInjectLibs().isEmpty()) {
             options.setForceLibraryInjection(mojo.getClosureForceInjectLibs());
         }
+
+        if (mojo.getClosureInlineConstantVars()) {
+            options.setInlineConstantVars(mojo.getClosureInlineConstantVars());
+        }
+        if (mojo.getClosureInlineFunctions() != null) {
+            options.setInlineFunctions(mojo.getClosureInlineFunctions());
+        }
+        if (mojo.getClosureInlineProperties()) {
+            options.setInlineProperties(mojo.getClosureInlineProperties());
+        }
+        if (mojo.getClosureInlineVariables() != null) {
+            options.setInlineVariables(mojo.getClosureInlineVariables());
+        }
+
         options.setLanguageIn(mojo.getClosureLanguageIn());
         options.setLanguageOut(mojo.getClosureLanguageOut());
         options.setModuleResolutionMode(mojo.getClosureModuleResolution());
@@ -346,7 +359,7 @@ public final class ClosureConfig {
             File baseDirForSourceFiles,
             File sourceDir)
             throws MojoFailureException, IOException {
-        CompilerOptions compilerOptions = SerializationUtils.clone(this.compilerOptions);
+        CompilerOptions compilerOptions = CompilerOptionsCloner.cloneCompilerOptions(this.compilerOptions);
 
         // Apply dependency options
         compilerOptions.setDependencyOptions(createDependencyOptions(baseDirForSourceFiles, sourceDir));

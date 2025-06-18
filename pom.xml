@@ -61,12 +61,12 @@
 
   <distributionManagement>
     <repository>
-      <id>ossrh</id>
+      <id>sonatype</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
     </repository>
     <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>sonatype</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
     </snapshotRepository>
     <site>
       <id>github</id>

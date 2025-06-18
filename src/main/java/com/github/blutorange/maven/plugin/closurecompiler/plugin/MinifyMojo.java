@@ -255,9 +255,9 @@ public class MinifyMojo extends AbstractMojo {
      *
      * <pre>
      * <code class="language-java">
-     * &lt;define>
+     * &lt;closureDefineReplacements>
      *     &lt;name>value&lt;/name>
-     * &lt;/define>
+     * &lt;/closureDefineReplacements>
      * </code>
      * </pre>
      *

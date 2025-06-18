@@ -219,7 +219,7 @@ public class MinifyMojo extends AbstractMojo {
      */
     @SuppressWarnings("unused")
     @Parameter(property = "closureInlineProperties")
-    private boolean closureInlineProperties;
+    private Boolean closureInlineProperties;
 
     /**
      * Set the variable inlining policy for the compiler.
@@ -237,7 +237,7 @@ public class MinifyMojo extends AbstractMojo {
      */
     @SuppressWarnings("unused")
     @Parameter(property = "closureCreateSourceMap", defaultValue = "false")
-    private boolean closureCreateSourceMap;
+    private Boolean closureCreateSourceMap;
 
     /**
      * Enable debugging options. Property renaming uses long mangled names which can be mapped back to the original
@@ -1313,7 +1313,7 @@ public class MinifyMojo extends AbstractMojo {
         return closureForceInjectLibs;
     }
 
-    public boolean getClosureInlineConstantVars() {
+    public Boolean getClosureInlineConstantVars() {
         return closureInlineConstantVars;
     }
 
@@ -1321,7 +1321,7 @@ public class MinifyMojo extends AbstractMojo {
         return closureInlineFunctions;
     }
 
-    public boolean getClosureInlineProperties() {
+    public Boolean getClosureInlineProperties() {
         return closureInlineProperties;
     }
 

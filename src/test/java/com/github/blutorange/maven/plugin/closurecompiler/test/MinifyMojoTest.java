@@ -270,6 +270,11 @@ public class MinifyMojoTest {
     }
 
     @Test
+    public void testInline() throws Exception {
+        runMinifyAndAssertDirContent("inline");
+    }
+
+    @Test
     public void testJQuery() throws Exception {
         runMinifyAndAssertDirContent("jquery");
     }

@@ -84,20 +84,6 @@ public final class ClosureConfig {
         if (!mojo.getClosureForceInjectLibs().isEmpty()) {
             options.setForceLibraryInjection(mojo.getClosureForceInjectLibs());
         }
-
-        if (mojo.getClosureInlineConstantVars()) {
-            options.setInlineConstantVars(mojo.getClosureInlineConstantVars());
-        }
-        if (mojo.getClosureInlineFunctions() != null) {
-            options.setInlineFunctions(mojo.getClosureInlineFunctions());
-        }
-        if (mojo.getClosureInlineProperties()) {
-            options.setInlineProperties(mojo.getClosureInlineProperties());
-        }
-        if (mojo.getClosureInlineVariables() != null) {
-            options.setInlineVariables(mojo.getClosureInlineVariables());
-        }
-
         options.setLanguageIn(mojo.getClosureLanguageIn());
         options.setLanguageOut(mojo.getClosureLanguageOut());
         options.setModuleResolutionMode(mojo.getClosureModuleResolution());
@@ -129,6 +115,20 @@ public final class ClosureConfig {
         }
         if (mojo.isClosureUseTypesForOptimization()) {
             mojo.getClosureCompilationLevel().setTypeBasedOptimizationOptions(options);
+        }
+
+        // These must be set after the compilation level was applied (as it may overwrite them).
+        if (mojo.getClosureInlineConstantVars() != null) {
+            options.setInlineConstantVars(mojo.getClosureInlineConstantVars());
+        }
+        if (mojo.getClosureInlineFunctions() != null) {
+            options.setInlineFunctions(mojo.getClosureInlineFunctions());
+        }
+        if (mojo.getClosureInlineProperties() != null) {
+            options.setInlineProperties(mojo.getClosureInlineProperties());
+        }
+        if (mojo.getClosureInlineVariables() != null) {
+            options.setInlineVariables(mojo.getClosureInlineVariables());
         }
 
         // Warning levels. First apply default, then specified overrides.

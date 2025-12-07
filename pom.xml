@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.blutorange</groupId>
   <artifactId>closure-compiler-maven-plugin</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Closure Compiler Maven Plugin</name>
@@ -635,6 +635,10 @@
         <version>${maven-scm-publish-plugin.version}</version>
         <configuration>
           <scmBranch>gh-pages</scmBranch>
+          <providerImplementations>
+            <!-- Either "git" or "jgit" -->
+            <git>git</git>
+          </providerImplementations>
         </configuration>
       </plugin>
 

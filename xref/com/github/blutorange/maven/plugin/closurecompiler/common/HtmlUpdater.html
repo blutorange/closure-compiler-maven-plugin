@@ -20,21 +20,21 @@
 <a class="jxr_linenumber" name="L12" href="#L12">12</a>  
 <a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdate;
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> com.github.blutorange.maven.plugin.closurecompiler.shared.HtmlUpdateConfig;
-<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
-<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> java.io.File;
-<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> java.nio.charset.Charset;
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
-<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> java.util.List;
-<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.ObjectUtils;
-<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.StringUtils;
-<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.maven.plugin.MojoExecutionException;
-<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.apache.maven.plugin.logging.Log;
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.jsoup.Jsoup;
-<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.jsoup.nodes.Document;
-<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.jsoup.nodes.Element;
-<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> org.jsoup.nodes.Range;
-<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> org.jsoup.parser.Parser;
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> java.io.File;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> java.nio.charset.Charset;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.ObjectUtils;
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.StringUtils;
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.maven.plugin.MojoExecutionException;
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.maven.plugin.logging.Log;
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.jsoup.Jsoup;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.jsoup.nodes.Document;
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.jsoup.nodes.Element;
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.jsoup.nodes.Range;
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> org.jsoup.parser.Parser;
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <strong class="jxr_keyword">import</strong> org.jsoup.parser.Tag;
 <a class="jxr_linenumber" name="L30" href="#L30">30</a>  <strong class="jxr_keyword">import</strong> org.jsoup.select.Elements;
 <a class="jxr_linenumber" name="L31" href="#L31">31</a>  
 <a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment">/**</em>
@@ -49,11 +49,11 @@
 <a class="jxr_linenumber" name="L41" href="#L41">41</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L42" href="#L42">42</a>  <em class="jxr_javadoccomment">     * Creates a new update for a minify plugin.</em>
 <a class="jxr_linenumber" name="L43" href="#L43">43</a>  <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <em class="jxr_javadoccomment">     * @param mojoMeta Mojo metadata with the Maven logger.</em>
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <em class="jxr_javadoccomment">     * @param log The Maven logger.</em>
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>  <em class="jxr_javadoccomment">     * @param updateConfig Plugin-global configuration for the HTML update operation.</em>
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L47" href="#L47">47</a>      <strong class="jxr_keyword">public</strong> <a name="HtmlUpdater" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/common/HtmlUpdater.html#HtmlUpdater">HtmlUpdater</a>(<a name="MojoMetadata" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/shared/MojoMetadata.html#MojoMetadata">MojoMetadata</a> mojoMeta, <a name="HtmlUpdateConfig" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/shared/HtmlUpdateConfig.html#HtmlUpdateConfig">HtmlUpdateConfig</a> updateConfig) {
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>          <strong class="jxr_keyword">this</strong>.log = mojoMeta.getLog();
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>      <strong class="jxr_keyword">public</strong> <a name="HtmlUpdater" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/common/HtmlUpdater.html#HtmlUpdater">HtmlUpdater</a>(Log log, <a name="HtmlUpdateConfig" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/shared/HtmlUpdateConfig.html#HtmlUpdateConfig">HtmlUpdateConfig</a> updateConfig) {
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>          <strong class="jxr_keyword">this</strong>.log = log;
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>          <strong class="jxr_keyword">this</strong>.updateConfig = updateConfig;
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>      }
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>  
@@ -277,30 +277,33 @@
 <a class="jxr_linenumber" name="L269" href="#L269">269</a> 
 <a class="jxr_linenumber" name="L270" href="#L270">270</a>     <strong class="jxr_keyword">private</strong> Document parseHtmlFile(File file, Charset encoding) {
 <a class="jxr_linenumber" name="L271" href="#L271">271</a>         <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> parser = isHtml(file) ? Parser.htmlParser() : Parser.xmlParser();
-<a class="jxr_linenumber" name="L272" href="#L272">272</a>         parser.setTrackErrors(100);
-<a class="jxr_linenumber" name="L273" href="#L273">273</a>         parser.setTrackPosition(<strong class="jxr_keyword">true</strong>);
-<a class="jxr_linenumber" name="L274" href="#L274">274</a>         <strong class="jxr_keyword">try</strong> {
-<a class="jxr_linenumber" name="L275" href="#L275">275</a>             <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> document = Jsoup.parse(file, encoding.name(), file.toURI().toASCIIString(), parser);
-<a class="jxr_linenumber" name="L276" href="#L276">276</a>             <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> error : parser.getErrors()) {
-<a class="jxr_linenumber" name="L277" href="#L277">277</a>                 log.error(<span class="jxr_string">"Encountered error while parsing &lt;"</span> + file + <span class="jxr_string">"&gt; at position &lt;"</span> + error.getCursorPos() + <span class="jxr_string">"&gt; : "</span>
-<a class="jxr_linenumber" name="L278" href="#L278">278</a>                         + error.getErrorMessage());
-<a class="jxr_linenumber" name="L279" href="#L279">279</a>             }
-<a class="jxr_linenumber" name="L280" href="#L280">280</a>             <strong class="jxr_keyword">return</strong> document;
-<a class="jxr_linenumber" name="L281" href="#L281">281</a>         } <strong class="jxr_keyword">catch</strong> (<strong class="jxr_keyword">final</strong> Exception e) {
-<a class="jxr_linenumber" name="L282" href="#L282">282</a>             log.error(<span class="jxr_string">"Could not update (X)HTML file, file &lt;"</span> + file + <span class="jxr_string">"could not be parsed"</span>, e);
-<a class="jxr_linenumber" name="L283" href="#L283">283</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
-<a class="jxr_linenumber" name="L284" href="#L284">284</a>         }
-<a class="jxr_linenumber" name="L285" href="#L285">285</a>     }
-<a class="jxr_linenumber" name="L286" href="#L286">286</a> 
-<a class="jxr_linenumber" name="L287" href="#L287">287</a>     <strong class="jxr_keyword">private</strong> List&lt;File&gt; resolveHtmlFiles(<a name="HtmlUpdate" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/plugin/HtmlUpdate.html#HtmlUpdate">HtmlUpdate</a> htmlUpdate) {
-<a class="jxr_linenumber" name="L288" href="#L288">288</a>         <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> base = getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getDir());
-<a class="jxr_linenumber" name="L289" href="#L289">289</a>         <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> htmlFiles = htmlUpdate.getFiles().getFiles(base);
-<a class="jxr_linenumber" name="L290" href="#L290">290</a>         <strong class="jxr_keyword">if</strong> (htmlFiles.isEmpty()) {
-<a class="jxr_linenumber" name="L291" href="#L291">291</a>             log.warn(<span class="jxr_string">"Did not find any HTML files to update in directory &lt;"</span> + base + <span class="jxr_string">"&gt; with "</span> + htmlUpdate.getFiles());
-<a class="jxr_linenumber" name="L292" href="#L292">292</a>         }
-<a class="jxr_linenumber" name="L293" href="#L293">293</a>         <strong class="jxr_keyword">return</strong> htmlFiles;
-<a class="jxr_linenumber" name="L294" href="#L294">294</a>     }
-<a class="jxr_linenumber" name="L295" href="#L295">295</a> }
+<a class="jxr_linenumber" name="L272" href="#L272">272</a>         <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> namespace = isHtml(file) ? <span class="jxr_string">"http://www.w3.org/1999/xhtml"</span> : <span class="jxr_string">"http://www.w3.org/XML/1998/namespace"</span>;
+<a class="jxr_linenumber" name="L273" href="#L273">273</a>         parser.setTrackErrors(100);
+<a class="jxr_linenumber" name="L274" href="#L274">274</a>         parser.setTrackPosition(<strong class="jxr_keyword">true</strong>);
+<a class="jxr_linenumber" name="L275" href="#L275">275</a>         <em class="jxr_comment">// Allow self-closing &lt;script /&gt; tags</em>
+<a class="jxr_linenumber" name="L276" href="#L276">276</a>         parser.tagSet().add(<strong class="jxr_keyword">new</strong> Tag(<span class="jxr_string">"script"</span>, namespace).set(Tag.SelfClose));
+<a class="jxr_linenumber" name="L277" href="#L277">277</a>         <strong class="jxr_keyword">try</strong> {
+<a class="jxr_linenumber" name="L278" href="#L278">278</a>             <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> document = Jsoup.parse(file, encoding.name(), file.toURI().toASCIIString(), parser);
+<a class="jxr_linenumber" name="L279" href="#L279">279</a>             <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> error : parser.getErrors()) {
+<a class="jxr_linenumber" name="L280" href="#L280">280</a>                 log.error(<span class="jxr_string">"Encountered error while parsing &lt;"</span> + file + <span class="jxr_string">"&gt; at position &lt;"</span> + error.getCursorPos() + <span class="jxr_string">"&gt; : "</span>
+<a class="jxr_linenumber" name="L281" href="#L281">281</a>                         + error.getErrorMessage());
+<a class="jxr_linenumber" name="L282" href="#L282">282</a>             }
+<a class="jxr_linenumber" name="L283" href="#L283">283</a>             <strong class="jxr_keyword">return</strong> document;
+<a class="jxr_linenumber" name="L284" href="#L284">284</a>         } <strong class="jxr_keyword">catch</strong> (<strong class="jxr_keyword">final</strong> Exception e) {
+<a class="jxr_linenumber" name="L285" href="#L285">285</a>             log.error(<span class="jxr_string">"Could not update (X)HTML file, file &lt;"</span> + file + <span class="jxr_string">"could not be parsed"</span>, e);
+<a class="jxr_linenumber" name="L286" href="#L286">286</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a class="jxr_linenumber" name="L287" href="#L287">287</a>         }
+<a class="jxr_linenumber" name="L288" href="#L288">288</a>     }
+<a class="jxr_linenumber" name="L289" href="#L289">289</a> 
+<a class="jxr_linenumber" name="L290" href="#L290">290</a>     <strong class="jxr_keyword">private</strong> List&lt;File&gt; resolveHtmlFiles(<a name="HtmlUpdate" href="../../../../../../../com/github/blutorange/maven/plugin/closurecompiler/plugin/HtmlUpdate.html#HtmlUpdate">HtmlUpdate</a> htmlUpdate) {
+<a class="jxr_linenumber" name="L291" href="#L291">291</a>         <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> base = getAbsoluteFile(updateConfig.getHtmlDir(), htmlUpdate.getDir());
+<a class="jxr_linenumber" name="L292" href="#L292">292</a>         <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">var</strong> htmlFiles = htmlUpdate.getFiles().getFiles(base);
+<a class="jxr_linenumber" name="L293" href="#L293">293</a>         <strong class="jxr_keyword">if</strong> (htmlFiles.isEmpty()) {
+<a class="jxr_linenumber" name="L294" href="#L294">294</a>             log.warn(<span class="jxr_string">"Did not find any HTML files to update in directory &lt;"</span> + base + <span class="jxr_string">"&gt; with "</span> + htmlUpdate.getFiles());
+<a class="jxr_linenumber" name="L295" href="#L295">295</a>         }
+<a class="jxr_linenumber" name="L296" href="#L296">296</a>         <strong class="jxr_keyword">return</strong> htmlFiles;
+<a class="jxr_linenumber" name="L297" href="#L297">297</a>     }
+<a class="jxr_linenumber" name="L298" href="#L298">298</a> }
 </pre>
 <hr/>
 <div id="footer">© 2009–2025 <a href="http://github.com/blutorange">Andre Wachsmuth</a></div>

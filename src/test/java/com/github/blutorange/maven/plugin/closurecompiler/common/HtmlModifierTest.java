@@ -16,6 +16,7 @@ import java.util.function.BiFunction;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
+import org.jsoup.parser.Tag;
 import org.junit.Test;
 
 public class HtmlModifierTest {
@@ -302,6 +303,9 @@ public class HtmlModifierTest {
             boolean html)
             throws IOException {
         var parser = html ? Parser.htmlParser() : Parser.xmlParser();
+        parser.tagSet()
+                .add(new Tag("script", html ? "http://www.w3.org/1999/xhtml" : "http://www.w3.org/XML/1998/namespace")
+                        .set(Tag.SelfClose));
         parser.setTrackErrors(100);
         parser.setTrackPosition(true);
         try (var input = new ByteArrayInputStream(inputHtml.getBytes(encoding))) {

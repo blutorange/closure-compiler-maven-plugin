@@ -1196,7 +1196,7 @@ public class MinifyMojo extends AbstractMojo {
                 resolvedHtmlScriptRoot,
                 htmlSourcePath,
                 htmlUsePhysicalRoot);
-        return new HtmlUpdater(mojoMeta, updateConfig);
+        return new HtmlUpdater(mojoMeta.getLog(), updateConfig);
     }
 
     private void fillOptionalValues() {

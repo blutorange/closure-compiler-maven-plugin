@@ -12,7 +12,6 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import com.github.blutorange.maven.plugin.closurecompiler.plugin.HtmlUpdate;
 import com.github.blutorange.maven.plugin.closurecompiler.shared.HtmlUpdateConfig;
-import com.github.blutorange.maven.plugin.closurecompiler.shared.MojoMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -27,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Range;
 import org.jsoup.parser.Parser;
+import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 /**
@@ -41,11 +41,11 @@ public final class HtmlUpdater {
     /**
      * Creates a new update for a minify plugin.
      *
-     * @param mojoMeta Mojo metadata with the Maven logger.
+     * @param log The Maven logger.
      * @param updateConfig Plugin-global configuration for the HTML update operation.
      */
-    public HtmlUpdater(MojoMetadata mojoMeta, HtmlUpdateConfig updateConfig) {
-        this.log = mojoMeta.getLog();
+    public HtmlUpdater(Log log, HtmlUpdateConfig updateConfig) {
+        this.log = log;
         this.updateConfig = updateConfig;
     }
 
@@ -269,8 +269,11 @@ public final class HtmlUpdater {
 
     private Document parseHtmlFile(File file, Charset encoding) {
         final var parser = isHtml(file) ? Parser.htmlParser() : Parser.xmlParser();
+        final var namespace = isHtml(file) ? "http://www.w3.org/1999/xhtml" : "http://www.w3.org/XML/1998/namespace";
         parser.setTrackErrors(100);
         parser.setTrackPosition(true);
+        // Allow self-closing <script /> tags
+        parser.tagSet().add(new Tag("script", namespace).set(Tag.SelfClose));
         try {
             final var document = Jsoup.parse(file, encoding.name(), file.toURI().toASCIIString(), parser);
             for (final var error : parser.getErrors()) {

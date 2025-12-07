@@ -7,7 +7,7 @@ See also the [closure compiler changelog](https://github.com/google/closure-comp
 * breaking: Requires at least Java 21. This is because closure compiler now requires Java 21.
 * feat: Add new options for inlining symbols
   (`closureInlineConstantVars`, `closureInlineFunctions`, `closureInlineProperties`, `closureInlineVariables`) #73
-* chore: Update closure compiler to latest `v20250528`
+* chore: Update dependencies and closure compiler to latest `v20250820`
 
 ## 2.32.0
 

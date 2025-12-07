@@ -7,7 +7,7 @@ them all to be lacking - by not having a recent version of closure compile, not 
 
 This plugin combines and minimizes JavaScript files. It produces a merged and a minified version.
 
-Requires at least Java 11.
+Requires at least Java 21 (same as required by closure compiler).
 
 # Notes regarding changes and updates
 
@@ -158,7 +158,7 @@ For the example above, this means that the source file name would be `js/index.j
 
 # Release
 
-* `./mvnw versions:display-dependency-updates`
+* `./mvnw versions:display-dependency-updates -Dmaven.version.ignore=".*-.+"`
 * Update version in `pom.xml` and `src/test/resources/projects/parent/pom.xml`.
 * Update CHANGELOG.md
 * Generate site, check links

@@ -11,7 +11,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<closure.compiler.maven.plugin.version>3.0.1</closure.compiler.maven.plugin.version>
+		<closure.compiler.maven.plugin.version>3.0.2-SNAPSHOT</closure.compiler.maven.plugin.version>
 		<maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
 	</properties>
 

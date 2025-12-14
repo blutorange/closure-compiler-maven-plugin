@@ -1,6 +1,6 @@
 package com.github.blutorange.maven.plugin.closurecompiler.common;
 
-import com.google.common.primitives.Primitives;
+import com.github.blutorange.maven.plugin.closurecompiler.plugin.LangUtils;
 import com.google.javascript.jscomp.CompilerOptions;
 import java.io.Serializable;
 import java.lang.reflect.Modifier;
@@ -60,7 +60,7 @@ final class CompilerOptionsCloner {
             return null;
         }
         final var type = val.getClass();
-        if (Primitives.unwrap(type).isPrimitive() || val instanceof Path) {
+        if (LangUtils.unwrapToPrimitive(type).isPrimitive() || val instanceof Path) {
             return val;
         }
         if (val instanceof Serializable serializable) {

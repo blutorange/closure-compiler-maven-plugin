@@ -2,6 +2,10 @@
 
 See also the [closure compiler changelog](https://github.com/google/closure-compiler/wiki/Releases).
 
+## 3.0.1
+
+* fix: Remove implicit (transitive) dependency on guava via Maven, #76
+
 ## 3.0.0
 
 * breaking: Requires at least Java 21. This is because closure compiler now requires Java 21.

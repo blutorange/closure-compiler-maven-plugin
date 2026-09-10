@@ -10,9 +10,9 @@ $jscomp.arrayIteratorImpl = function(a) {
 $jscomp.arrayIterator = function(a) {
   return {next:$jscomp.arrayIteratorImpl(a)};
 };
-$jscomp.ASSUME_ES5 = !1;
-$jscomp.ASSUME_ES6 = !1;
 $jscomp.ASSUME_ES2020 = !1;
+$jscomp.ASSUME_ES6 = $jscomp.ASSUME_ES2020;
+$jscomp.ASSUME_ES5 = $jscomp.ASSUME_ES6;
 $jscomp.ASSUME_NO_NATIVE_MAP = !1;
 $jscomp.ASSUME_NO_NATIVE_SET = !1;
 $jscomp.ISOLATE_POLYFILLS = !0;
@@ -50,6 +50,19 @@ var $jscomp$lookupPolyfilledValue = function(a, c, b) {
     }
     b = a[b];
     return b !== void 0 ? b : a[c];
+  }
+};
+$jscomp.TYPED_ARRAY_CLASSES = function() {
+  var a = "Int8 Uint8 Uint8Clamped Int16 Uint16 Int32 Uint32 Float32 Float64".split(" ");
+  $jscomp.global.BigInt64Array && (a.push("BigInt64"), a.push("BigUint64"));
+  return a;
+}();
+$jscomp.polyfillTypedArrayMethod = function(a, c, b, d) {
+  if (c) {
+    for (var e = 0; e < $jscomp.TYPED_ARRAY_CLASSES.length; e++) {
+      var f = $jscomp.TYPED_ARRAY_CLASSES[e] + "Array.prototype." + a;
+      $jscomp.ISOLATE_POLYFILLS ? $jscomp.polyfillIsolated(f, c, b, d) : $jscomp.polyfillUnisolated(f, c, b, d);
+    }
   }
 };
 $jscomp.polyfill = function(a, c, b, d) {

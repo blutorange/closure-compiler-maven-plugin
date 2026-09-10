@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import io.takari.maven.testing.TestResources5;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,7 +83,7 @@ public class MinifyMojoTest {
     private final Logger LOG = LoggerFactory.getLogger(MinifyMojoTest.class.getCanonicalName());
 
     @RegisterExtension
-    final TestResources5 testResources = new TestResources5("src/test/resources/projects", "target/test-projects");
+    final TestProjects testProjects = new TestProjects("src/test/resources/projects", "target/test-projects");
 
     private void assertDirContent(File basedir) throws IOException {
         var actual = new File(new File(basedir, "target"), "test");
@@ -191,13 +190,13 @@ public class MinifyMojoTest {
     }
 
     private MavenResult runMinify(String projectName, Collection<String> profiles) throws Exception {
-        final var parentDir = testResources.getBasedir("parent").getCanonicalFile();
+        final var parentDir = testProjects.getBasedir("parent").getCanonicalFile();
         final var parentPom = new File(parentDir, "pom.xml");
         final var parentPomNew = new File(parentDir.getParentFile(), "pom.xml");
         assertTrue(parentPom.exists());
         FileUtils.copyFile(parentPom, parentPomNew);
 
-        final var basedir = testResources.getBasedir(projectName).getCanonicalFile();
+        final var basedir = testProjects.getBasedir(projectName).getCanonicalFile();
         final var pom = new File(basedir, "pom.xml");
         assertTrue(pom.exists());
 
@@ -215,7 +214,7 @@ public class MinifyMojoTest {
     }
 
     private void runMinifyAndAssertDirContent(String projectName, Collection<String> profiles) throws Exception {
-        var basedir = testResources.getBasedir(projectName).getCanonicalFile();
+        var basedir = testProjects.getBasedir(projectName).getCanonicalFile();
         runMinify(projectName, profiles);
         assertDirContent(basedir);
     }

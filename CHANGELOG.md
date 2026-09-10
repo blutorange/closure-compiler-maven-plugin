@@ -2,6 +2,21 @@
 
 See also the [closure compiler changelog](https://github.com/google/closure-compiler/wiki/Releases).
 
+## 3.1.0
+
+* chore: Update to closure compiler `v20260831`
+* chore: Pin `plexus-build-api` to 1.2.0. Its 1.3.0 release ships `DefaultProgress` annotated with both
+  `@Singleton` and `@MojoExecutionScoped`, which makes Guice refuse to create an injector for the
+  plugin's class realm, so the plugin could not be loaded at all.
+* chore: Keep `plexus-utils` / `maven-resolver` / `sisu` aligned with the Maven version the plugin
+  builds against, and stop shipping Maven-provided artifacts in the plugin class realm.
+* chore: Remove unused build configuration (`sisu-maven-plugin`, empty `site` profile, dead version
+  properties) and dependency management entries that are no longer needed.
+* chore: Update `palantir-java-format`, which did not run on current JDKs.
+* chore: Replace `takari-plugin-testing` with a small JUnit extension, removing JUnit 4 and hamcrest
+  from the test class path.
+* chore: `HtmlModifierTest` used the JUnit 4 `@Test` annotation and only ran by accident.
+
 ## 3.0.1
 
 * fix: Remove implicit (transitive) dependency on guava via Maven, #76

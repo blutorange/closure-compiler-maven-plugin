@@ -17,7 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.parser.Tag;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HtmlModifierTest {
     @Test

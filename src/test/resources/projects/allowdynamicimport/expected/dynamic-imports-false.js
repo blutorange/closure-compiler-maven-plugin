@@ -1,9 +1,9 @@
 'use strict';
 var $jscomp = $jscomp || {};
 $jscomp.scope = {};
-$jscomp.ASSUME_ES5 = !1;
-$jscomp.ASSUME_ES6 = !1;
 $jscomp.ASSUME_ES2020 = !1;
+$jscomp.ASSUME_ES6 = $jscomp.ASSUME_ES2020;
+$jscomp.ASSUME_ES5 = $jscomp.ASSUME_ES6;
 $jscomp.ASSUME_NO_NATIVE_MAP = !1;
 $jscomp.ASSUME_NO_NATIVE_SET = !1;
 $jscomp.ISOLATE_POLYFILLS = !1;
@@ -41,6 +41,19 @@ var $jscomp$lookupPolyfilledValue = function(a, b, c) {
     }
     c = a[c];
     return c !== void 0 ? c : a[b];
+  }
+};
+$jscomp.TYPED_ARRAY_CLASSES = function() {
+  var a = "Int8 Uint8 Uint8Clamped Int16 Uint16 Int32 Uint32 Float32 Float64".split(" ");
+  $jscomp.global.BigInt64Array && (a.push("BigInt64"), a.push("BigUint64"));
+  return a;
+}();
+$jscomp.polyfillTypedArrayMethod = function(a, b, c, d) {
+  if (b) {
+    for (var e = 0; e < $jscomp.TYPED_ARRAY_CLASSES.length; e++) {
+      var f = $jscomp.TYPED_ARRAY_CLASSES[e] + "Array.prototype." + a;
+      $jscomp.ISOLATE_POLYFILLS ? $jscomp.polyfillIsolated(f, b, c, d) : $jscomp.polyfillUnisolated(f, b, c, d);
+    }
   }
 };
 $jscomp.polyfill = function(a, b, c, d) {
@@ -145,18 +158,33 @@ $jscomp.generator.Context.prototype.throw_ = function(a) {
   this.abruptCompletion_ = {exception:a, isException:!0};
   this.jumpToErrorHandler_();
 };
+$jscomp.generator.Context.prototype.getNextAddressJsc = function() {
+  return this.nextAddress;
+};
+$jscomp.generator.Context.prototype.getNextAddressJsc = function() {
+  return this.nextAddress;
+};
+$jscomp.generator.Context.prototype.getYieldResultJsc = function() {
+  return this.yieldResult;
+};
+$jscomp.generator.Context.prototype.getYieldResultJsc = function() {
+  return this.yieldResult;
+};
 $jscomp.generator.Context.prototype.return = function(a) {
   this.abruptCompletion_ = {return:a};
   this.nextAddress = this.finallyAddress_;
 };
+$jscomp.generator.Context.prototype["return"] = $jscomp.generator.Context.prototype.return;
 $jscomp.generator.Context.prototype.jumpThroughFinallyBlocks = function(a) {
   this.abruptCompletion_ = {jumpTo:a};
-  this.nextAddress = this.finallyAddress_;
+  this.finallyAddress_ < a ? (this.nextAddress = a, this.abruptCompletion_ = null) : this.nextAddress = this.finallyAddress_;
 };
+$jscomp.generator.Context.prototype.jumpThroughFinallyBlocks = $jscomp.generator.Context.prototype.jumpThroughFinallyBlocks;
 $jscomp.generator.Context.prototype.yield = function(a, b) {
   this.nextAddress = b;
   return {value:a};
 };
+$jscomp.generator.Context.prototype.yield = $jscomp.generator.Context.prototype.yield;
 $jscomp.generator.Context.prototype.yieldAll = function(a, b) {
   a = $jscomp.makeIterator(a);
   var c = a.next();
@@ -167,35 +195,44 @@ $jscomp.generator.Context.prototype.yieldAll = function(a, b) {
     return this.yieldAllIterator_ = a, this.yield(c.value, b);
   }
 };
+$jscomp.generator.Context.prototype.yieldAll = $jscomp.generator.Context.prototype.yieldAll;
 $jscomp.generator.Context.prototype.jumpTo = function(a) {
   this.nextAddress = a;
 };
+$jscomp.generator.Context.prototype.jumpTo = $jscomp.generator.Context.prototype.jumpTo;
 $jscomp.generator.Context.prototype.jumpToEnd = function() {
   this.nextAddress = 0;
 };
+$jscomp.generator.Context.prototype.jumpToEnd = $jscomp.generator.Context.prototype.jumpToEnd;
 $jscomp.generator.Context.prototype.setCatchFinallyBlocks = function(a, b) {
   this.catchAddress_ = a;
   b != void 0 && (this.finallyAddress_ = b);
 };
+$jscomp.generator.Context.prototype.setCatchFinallyBlocks = $jscomp.generator.Context.prototype.setCatchFinallyBlocks;
 $jscomp.generator.Context.prototype.setFinallyBlock = function(a) {
   this.catchAddress_ = 0;
   this.finallyAddress_ = a || 0;
 };
+$jscomp.generator.Context.prototype.setFinallyBlock = $jscomp.generator.Context.prototype.setFinallyBlock;
 $jscomp.generator.Context.prototype.leaveTryBlock = function(a, b) {
   this.nextAddress = a;
   this.catchAddress_ = b || 0;
 };
+$jscomp.generator.Context.prototype.leaveTryBlock = $jscomp.generator.Context.prototype.leaveTryBlock;
 $jscomp.generator.Context.prototype.enterCatchBlock = function(a) {
   this.catchAddress_ = a || 0;
   a = this.abruptCompletion_.exception;
   this.abruptCompletion_ = null;
   return a;
 };
+$jscomp.generator.Context.prototype.enterCatchBlock = $jscomp.generator.Context.prototype.enterCatchBlock;
 $jscomp.generator.Context.prototype.enterFinallyBlock = function(a, b, c) {
   c ? this.finallyContexts_[c] = this.abruptCompletion_ : this.finallyContexts_ = [this.abruptCompletion_];
   this.catchAddress_ = a || 0;
   this.finallyAddress_ = b || 0;
+  this.abruptCompletion_ = null;
 };
+$jscomp.generator.Context.prototype.enterFinallyBlock = $jscomp.generator.Context.prototype.enterFinallyBlock;
 $jscomp.generator.Context.prototype.leaveFinallyBlock = function(a, b) {
   b = this.finallyContexts_.splice(b || 0)[0];
   if (b = this.abruptCompletion_ = this.abruptCompletion_ || b) {
@@ -207,9 +244,11 @@ $jscomp.generator.Context.prototype.leaveFinallyBlock = function(a, b) {
     this.nextAddress = a;
   }
 };
+$jscomp.generator.Context.prototype.leaveFinallyBlock = $jscomp.generator.Context.prototype.leaveFinallyBlock;
 $jscomp.generator.Context.prototype.forIn = function(a) {
   return new $jscomp.generator.Context.PropertyIterator(a);
 };
+$jscomp.generator.Context.prototype.forIn = $jscomp.generator.Context.prototype.forIn;
 $jscomp.generator.Context.PropertyIterator = function(a) {
   this.object_ = a;
   this.properties_ = [];
@@ -227,6 +266,7 @@ $jscomp.generator.Context.PropertyIterator.prototype.getNext = function() {
   }
   return null;
 };
+$jscomp.generator.Context.PropertyIterator.prototype.getNext = $jscomp.generator.Context.PropertyIterator.prototype.getNext;
 $jscomp.generator.Engine_ = function(a) {
   this.context_ = new $jscomp.generator.Context();
   this.program_ = a;
@@ -253,7 +293,22 @@ $jscomp.generator.Engine_.prototype.return_ = function(a) {
 $jscomp.generator.Engine_.prototype.throw_ = function(a) {
   this.context_.start_();
   if (this.context_.yieldAllIterator_) {
-    return this.yieldAllStep_(this.context_.yieldAllIterator_["throw"], a, this.context_.next_);
+    var b = this.context_.yieldAllIterator_["throw"];
+    if (b) {
+      return this.yieldAllStep_(b, a, this.context_.next_);
+    }
+    a = this.context_.yieldAllIterator_;
+    this.context_.yieldAllIterator_ = null;
+    try {
+      if (a["return"]) {
+        var c = a["return"]();
+        $jscomp.generator.ensureIteratorResultIsObject_(c);
+      }
+      this.context_.throw_(new TypeError("The iterator does not provide a 'throw' method."));
+    } catch (d) {
+      this.context_.throw_(d);
+    }
+    return this.nextStep_();
   }
   this.context_.throw_(a);
   return this.nextStep_();

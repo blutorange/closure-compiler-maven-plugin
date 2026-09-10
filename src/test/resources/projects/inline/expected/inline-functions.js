@@ -13,7 +13,7 @@ class TestClass {
   }
   dumpStyles() {
     console.log(this.styles);
-    const a = ["1", "2", "3"];
+    var a = ["1", "2", "3"];
     console.log(a.join(";"));
   }
 }
